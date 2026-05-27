@@ -4,221 +4,74 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<title>3D Interactive Night Sky</title>
+<title>Immersive 3D Constellation Map</title>
 
 <style>
 
-*{
+html, body{
   margin:0;
-  padding:0;
-  box-sizing:border-box;
-}
-
-body{
   overflow:hidden;
-  background:
-    radial-gradient(circle at center,
-    #111827 0%,
-    #03040a 70%,
-    #000 100%);
+  background:black;
   font-family:Arial, sans-serif;
-  color:white;
+  height:100%;
 }
 
 /* TITLE */
 
-h1{
+#title{
   position:absolute;
   top:20px;
   width:100%;
   text-align:center;
-  z-index:1000;
-  font-size:2.4rem;
-  font-weight:300;
-  letter-spacing:4px;
-  color:rgba(255,255,255,0.9);
-  text-shadow:
-    0 0 12px rgba(255,255,255,0.7),
-    0 0 30px rgba(120,160,255,0.5);
-  pointer-events:none;
-}
-
-/* SCENE */
-
-.scene{
-  width:100vw;
-  height:100vh;
-  perspective:1200px;
-  overflow:hidden;
-  cursor:grab;
-}
-
-.scene:active{
-  cursor:grabbing;
-}
-
-/* SKY SPHERE */
-
-.sky{
-  position:absolute;
-  width:2000px;
-  height:2000px;
-  left:50%;
-  top:50%;
-  transform-style:preserve-3d;
-  transform:
-    translate(-50%, -50%)
-    rotateX(0deg)
-    rotateY(0deg);
-}
-
-/* STARS */
-
-.star-group{
-  position:absolute;
-  transform-style:preserve-3d;
-  text-align:center;
-  transition:
-    transform 0.2s ease,
-    z-index 0.2s;
-}
-
-.star{
-  margin:auto;
-  border-radius:50%;
-  background:
-    radial-gradient(circle,
-    rgba(255,255,255,1) 0%,
-    rgba(255,255,255,0.85) 20%,
-    rgba(255,255,255,0.2) 65%,
-    transparent 100%);
-  animation:twinkle ease-in-out infinite;
-  transition:all 0.3s ease;
-}
-
-/* STAR SIZES */
-
-.small{
-  width:5px;
-  height:5px;
-}
-
-.medium{
-  width:10px;
-  height:10px;
-}
-
-.large{
-  width:16px;
-  height:16px;
-}
-
-/* LABELS */
-
-.label{
-  margin-top:10px;
-  font-size:0.78rem;
-  color:rgba(255,255,255,0.45);
-  white-space:nowrap;
-  pointer-events:none;
-  transition:all 0.25s ease;
-  letter-spacing:0.5px;
-}
-
-/* HOVER EFFECT */
-
-.star-group:hover{
-  z-index:999;
-}
-
-.star-group:hover .star{
-  transform:scale(2.8);
-  box-shadow:
-    0 0 15px white,
-    0 0 35px rgba(255,255,255,0.9),
-    0 0 70px rgba(100,150,255,0.7);
-}
-
-.star-group:hover .label{
   color:white;
-  font-size:1rem;
-  transform:translateY(-5px);
+  z-index:10;
+  font-size:2.2rem;
+  letter-spacing:4px;
+  font-weight:300;
   text-shadow:
-    0 0 10px white,
-    0 0 20px rgba(100,150,255,0.8);
+    0 0 10px rgba(255,255,255,0.7),
+    0 0 30px rgba(100,150,255,0.6);
+  pointer-events:none;
 }
 
-/* BACKGROUND STARS */
+/* INFO BOX */
 
-.bg-star{
+#info{
   position:absolute;
-  border-radius:50%;
-  background:white;
-  opacity:0.7;
-  animation:twinkle linear infinite;
-}
-
-/* INFO PANEL */
-
-.info{
-  position:absolute;
-  right:30px;
   bottom:30px;
+  right:30px;
   width:320px;
-  padding:20px;
-  border-radius:20px;
-  background:rgba(255,255,255,0.05);
+  padding:18px;
+  border-radius:18px;
+  background:rgba(255,255,255,0.06);
   backdrop-filter:blur(10px);
-  border:1px solid rgba(255,255,255,0.08);
-  z-index:1000;
+  border:1px solid rgba(255,255,255,0.1);
   color:rgba(255,255,255,0.85);
+  z-index:10;
   line-height:1.5;
 }
 
-/* SHOOTING STAR */
+/* STAR LABEL */
 
-.shooting-star{
+#label{
   position:absolute;
-  width:200px;
-  height:2px;
-  background:
-    linear-gradient(to right,
-    rgba(255,255,255,1),
-    transparent);
-  opacity:0;
-  transform:rotate(-30deg);
-  animation:shooting 12s linear infinite;
+  color:white;
+  background:rgba(0,0,0,0.75);
+  padding:10px 14px;
+  border-radius:10px;
+  pointer-events:none;
+  transform:translate(-50%, -120%);
+  display:none;
+  z-index:20;
+  font-size:0.95rem;
+  border:1px solid rgba(255,255,255,0.15);
+  backdrop-filter:blur(6px);
+  box-shadow:
+    0 0 15px rgba(255,255,255,0.15);
 }
 
-/* ANIMATIONS */
-
-@keyframes twinkle{
-  0%{ opacity:0.4; }
-  50%{ opacity:1; }
-  100%{ opacity:0.4; }
-}
-
-@keyframes shooting{
-
-  0%{
-    top:-10%;
-    left:-20%;
-    opacity:0;
-  }
-
-  5%{
-    opacity:1;
-  }
-
-  15%{
-    top:40%;
-    left:120%;
-    opacity:0;
-  }
-
-  100%{
-    opacity:0;
-  }
+canvas{
+  display:block;
 }
 
 </style>
@@ -226,176 +79,397 @@ h1{
 
 <body>
 
-<h1>Interactive 3D Night Sky</h1>
-
-<div class="scene" id="scene">
-
-  <div class="sky" id="sky">
-
-    <!-- SHOOTING STAR -->
-    <div class="shooting-star"></div>
-
-    <!-- CONSTELLATION STARS -->
-
-    <!-- ORION -->
-    <div class="star-group" style="left:1200px; top:400px;">
-      <div class="star large"></div>
-      <div class="label">Betelgeuse — Red supergiant</div>
-    </div>
-
-    <div class="star-group" style="left:1300px; top:600px;">
-      <div class="star medium"></div>
-      <div class="label">Alnilam — Belt star</div>
-    </div>
-
-    <div class="star-group" style="left:1380px; top:850px;">
-      <div class="star large"></div>
-      <div class="label">Rigel — Blue supergiant</div>
-    </div>
-
-    <!-- CRUX -->
-    <div class="star-group" style="left:1650px; top:1200px;">
-      <div class="star medium"></div>
-      <div class="label">Mimosa — Blue giant</div>
-    </div>
-
-    <div class="star-group" style="left:1720px; top:1380px;">
-      <div class="star large"></div>
-      <div class="label">Acrux — Brightest in Crux</div>
-    </div>
-
-    <!-- PUPPIS -->
-    <div class="star-group" style="left:600px; top:1100px;">
-      <div class="star large"></div>
-      <div class="label">Naos — Blue supergiant</div>
-    </div>
-
-    <div class="star-group" style="left:760px; top:980px;">
-      <div class="star medium"></div>
-      <div class="label">Suhail — Navigation star</div>
-    </div>
-
-    <!-- CANIS MAJOR -->
-    <div class="star-group" style="left:1100px; top:1500px;">
-      <div class="star large"></div>
-      <div class="label">Sirius — Brightest night star</div>
-    </div>
-
-    <div class="star-group" style="left:1250px; top:1400px;">
-      <div class="star medium"></div>
-      <div class="label">Adhara — Extremely luminous</div>
-    </div>
-
-    <!-- SCORPIUS -->
-    <div class="star-group" style="left:350px; top:700px;">
-      <div class="star large"></div>
-      <div class="label">Antares — Red supergiant</div>
-    </div>
-
-    <div class="star-group" style="left:450px; top:900px;">
-      <div class="star medium"></div>
-      <div class="label">Shaula — Scorpion tail star</div>
-    </div>
-
-    <!-- TAURUS -->
-    <div class="star-group" style="left:1450px; top:250px;">
-      <div class="star large"></div>
-      <div class="label">Aldebaran — Orange giant</div>
-    </div>
-
-    <!-- BACKGROUND STARS GENERATED BY JS -->
-
-  </div>
-
+<div id="title">
+  Interactive 3D Night Sky
 </div>
 
-<div class="info">
-  <strong>3D Sky Navigation</strong><br><br>
+<div id="info">
+  <strong>Immersive Constellation Viewer</strong><br><br>
 
-  Click and drag to rotate the night sky.
-  Hover over stars to reveal constellation details.
-
-  <br><br>
+  Drag to look around the celestial sphere.<br>
+  Scroll to zoom.<br>
+  Hover stars for details.<br><br>
 
   Includes:
   Orion, Crux, Puppis,
-  Canis Major, Scorpius,
-  and Taurus.
-
+  Scorpius, Taurus,
+  and Canis Major.
 </div>
+
+<div id="label"></div>
+
+<!-- THREE.JS -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+
+<!-- ORBIT CONTROLS -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
 
 <script>
 
-/* BACKGROUND STARS */
+/* ---------------------------
+SCENE SETUP
+---------------------------- */
 
-const sky = document.getElementById("sky");
+const scene = new THREE.Scene();
 
-for(let i=0;i<500;i++){
+scene.fog =
+  new THREE.FogExp2(0x000000, 0.0007);
 
-  const s = document.createElement("div");
+const camera =
+  new THREE.PerspectiveCamera(
+    75,
+    window.innerWidth/window.innerHeight,
+    0.1,
+    5000
+  );
 
-  s.classList.add("bg-star");
+camera.position.set(0,0,0.1);
 
-  const size = Math.random()*3;
+const renderer =
+  new THREE.WebGLRenderer({
+    antialias:true
+  });
 
-  s.style.width = size + "px";
-  s.style.height = size + "px";
+renderer.setSize(
+  window.innerWidth,
+  window.innerHeight
+);
 
-  s.style.left = Math.random()*2000 + "px";
-  s.style.top = Math.random()*2000 + "px";
+renderer.setPixelRatio(window.devicePixelRatio);
 
-  s.style.animationDuration =
-    (2 + Math.random()*6) + "s";
+document.body.appendChild(renderer.domElement);
 
-  sky.appendChild(s);
+/* ---------------------------
+CONTROLS
+---------------------------- */
+
+const controls =
+  new THREE.OrbitControls(
+    camera,
+    renderer.domElement
+  );
+
+controls.enablePan = false;
+controls.enableDamping = true;
+controls.dampingFactor = 0.04;
+controls.rotateSpeed = 0.6;
+controls.minDistance = 0.1;
+controls.maxDistance = 2;
+
+/* ---------------------------
+STARFIELD
+---------------------------- */
+
+const bgGeometry =
+  new THREE.BufferGeometry();
+
+const bgVertices = [];
+
+for(let i=0;i<5000;i++){
+
+  const radius = 1800;
+
+  const theta =
+    Math.random()*Math.PI*2;
+
+  const phi =
+    Math.acos(
+      (Math.random()*2)-1
+    );
+
+  const x =
+    radius *
+    Math.sin(phi) *
+    Math.cos(theta);
+
+  const y =
+    radius *
+    Math.sin(phi) *
+    Math.sin(theta);
+
+  const z =
+    radius *
+    Math.cos(phi);
+
+  bgVertices.push(x,y,z);
 }
 
-/* DRAG ROTATION */
+bgGeometry.setAttribute(
+  'position',
+  new THREE.Float32BufferAttribute(
+    bgVertices,
+    3
+  )
+);
 
-const scene = document.getElementById("scene");
+const bgMaterial =
+  new THREE.PointsMaterial({
+    color:0xffffff,
+    size:2,
+    transparent:true,
+    opacity:0.8
+  });
 
-let isDragging = false;
+const backgroundStars =
+  new THREE.Points(
+    bgGeometry,
+    bgMaterial
+  );
 
-let currentX = 0;
-let currentY = 0;
+scene.add(backgroundStars);
 
-let targetX = 0;
-let targetY = 0;
+/* ---------------------------
+CONSTELLATION STARS
+---------------------------- */
 
-scene.addEventListener("mousedown",(e)=>{
-  isDragging = true;
+const stars = [
+
+{
+  name:"Betelgeuse",
+  desc:"Red supergiant in Orion",
+  color:0xff8855,
+  size:10,
+  theta:1.2,
+  phi:1.1
+},
+
+{
+  name:"Rigel",
+  desc:"Blue supergiant in Orion",
+  color:0x99ccff,
+  size:9,
+  theta:1.35,
+  phi:1.4
+},
+
+{
+  name:"Sirius",
+  desc:"Brightest night sky star",
+  color:0xffffff,
+  size:12,
+  theta:2.0,
+  phi:1.8
+},
+
+{
+  name:"Acrux",
+  desc:"Brightest star in Crux",
+  color:0xaaccff,
+  size:10,
+  theta:3.0,
+  phi:2.1
+},
+
+{
+  name:"Mimosa",
+  desc:"Blue giant in Crux",
+  color:0xaaccff,
+  size:8,
+  theta:3.1,
+  phi:2.0
+},
+
+{
+  name:"Antares",
+  desc:"Red supergiant in Scorpius",
+  color:0xff6644,
+  size:11,
+  theta:4.0,
+  phi:1.5
+},
+
+{
+  name:"Aldebaran",
+  desc:"Orange giant in Taurus",
+  color:0xffaa66,
+  size:9,
+  theta:5.0,
+  phi:1.0
+},
+
+{
+  name:"Naos",
+  desc:"Blue supergiant in Puppis",
+  color:0xaaddff,
+  size:9,
+  theta:2.7,
+  phi:2.3
+}
+
+];
+
+const starObjects = [];
+
+const starTexture =
+  new THREE.TextureLoader().load(
+    "https://threejs.org/examples/textures/sprites/disc.png"
+  );
+
+stars.forEach(star=>{
+
+  const radius = 1000;
+
+  const x =
+    radius *
+    Math.sin(star.phi) *
+    Math.cos(star.theta);
+
+  const y =
+    radius *
+    Math.cos(star.phi);
+
+  const z =
+    radius *
+    Math.sin(star.phi) *
+    Math.sin(star.theta);
+
+  const material =
+    new THREE.SpriteMaterial({
+      map:starTexture,
+      color:star.color,
+      transparent:true,
+      blending:THREE.AdditiveBlending
+    });
+
+  const sprite =
+    new THREE.Sprite(material);
+
+  sprite.position.set(x,y,z);
+
+  sprite.scale.set(
+    star.size,
+    star.size,
+    1
+  );
+
+  sprite.userData = {
+    name:star.name,
+    desc:star.desc
+  };
+
+  scene.add(sprite);
+
+  starObjects.push(sprite);
+
 });
 
-window.addEventListener("mouseup",()=>{
-  isDragging = false;
-});
+/* ---------------------------
+RAYCASTING
+---------------------------- */
 
-window.addEventListener("mousemove",(e)=>{
+const raycaster =
+  new THREE.Raycaster();
 
-  if(!isDragging) return;
+const mouse =
+  new THREE.Vector2();
 
-  targetY += e.movementX * 0.3;
-  targetX -= e.movementY * 0.3;
-});
+const label =
+  document.getElementById("label");
 
-/* SMOOTH ANIMATION */
+window.addEventListener(
+  "mousemove",
+  event=>{
+
+    mouse.x =
+      (event.clientX /
+      window.innerWidth)*2-1;
+
+    mouse.y =
+      -(event.clientY /
+      window.innerHeight)*2+1;
+
+  }
+);
+
+/* ---------------------------
+ANIMATION
+---------------------------- */
 
 function animate(){
 
-  currentX += (targetX-currentX)*0.08;
-  currentY += (targetY-currentY)*0.08;
-
-  sky.style.transform =
-    `
-    translate(-50%, -50%)
-    rotateX(${currentX}deg)
-    rotateY(${currentY}deg)
-    `;
-
   requestAnimationFrame(animate);
+
+  controls.update();
+
+  backgroundStars.rotation.y += 0.0001;
+
+  raycaster.setFromCamera(
+    mouse,
+    camera
+  );
+
+  const intersects =
+    raycaster.intersectObjects(
+      starObjects
+    );
+
+  if(intersects.length>0){
+
+    const obj = intersects[0].object;
+
+    label.style.display = "block";
+
+    label.innerHTML =
+      "<strong>" +
+      obj.userData.name +
+      "</strong><br>" +
+      obj.userData.desc;
+
+    label.style.left =
+      event.clientX + "px";
+
+    label.style.top =
+      event.clientY + "px";
+
+    obj.scale.set(18,18,1);
+
+  } else {
+
+    label.style.display = "none";
+
+    starObjects.forEach(star=>{
+
+      const original =
+        stars.find(
+          s=>s.name===star.userData.name
+        );
+
+      star.scale.set(
+        original.size,
+        original.size,
+        1
+      );
+
+    });
+
+  }
+
+  renderer.render(scene,camera);
 }
 
 animate();
+
+/* ---------------------------
+RESIZE
+---------------------------- */
+
+window.addEventListener(
+  "resize",
+  ()=>{
+
+    camera.aspect =
+      window.innerWidth/
+      window.innerHeight;
+
+    camera.updateProjectionMatrix();
+
+    renderer.setSize(
+      window.innerWidth,
+      window.innerHeight
+    );
+
+  }
+);
 
 </script>
 
