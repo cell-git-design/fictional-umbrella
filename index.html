@@ -2,207 +2,410 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<title>Interactive Southern Sky Map</title>
+<title>Interactive Southern Sky</title>
 
 <style>
-  body {
-    margin: 0;
-    overflow: hidden;
-    background:
-      radial-gradient(circle at bottom, #101830 0%, #05070d 70%);
-    font-family: Arial, sans-serif;
-    color: white;
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  overflow:hidden;
+  background:
+    radial-gradient(circle at bottom,
+    #16213d 0%,
+    #090b14 40%,
+    #020305 100%);
+  font-family:Arial, sans-serif;
+  height:100vh;
+  color:white;
+}
+
+/* TITLE */
+
+h1{
+  position:absolute;
+  top:18px;
+  width:100%;
+  text-align:center;
+  z-index:1000;
+  font-size:2.6rem;
+  letter-spacing:4px;
+  font-weight:300;
+  color:rgba(255,255,255,0.92);
+  text-shadow:
+    0 0 10px rgba(255,255,255,0.7),
+    0 0 30px rgba(120,160,255,0.5);
+}
+
+/* SKY */
+
+.sky{
+  position:relative;
+  width:100vw;
+  height:100vh;
+  transform-style:preserve-3d;
+  transition:transform 0.15s linear;
+  perspective:1200px;
+}
+
+/* BACKGROUND STARS */
+
+.background-star{
+  position:absolute;
+  border-radius:50%;
+  background:white;
+  opacity:0.7;
+  animation:twinkle linear infinite;
+}
+
+/* MAIN STAR GROUP */
+
+.star-group{
+  position:absolute;
+  transform-style:preserve-3d;
+  transform:translate(-50%, -50%);
+  transition:transform 0.15s ease;
+  text-align:center;
+}
+
+/* STARS */
+
+.star{
+  margin:auto;
+  border-radius:50%;
+  background:
+    radial-gradient(circle,
+    rgba(255,255,255,1) 0%,
+    rgba(255,255,255,0.9) 20%,
+    rgba(255,255,255,0.2) 60%,
+    rgba(255,255,255,0) 100%);
+  animation:twinkle 3s ease-in-out infinite;
+  transition:all 0.3s ease;
+}
+
+/* STAR SIZES */
+
+.small{ width:6px; height:6px; }
+.medium{ width:10px; height:10px; }
+.large{ width:16px; height:16px; }
+
+/* LABELS */
+
+.label{
+  margin-top:10px;
+  font-size:0.78rem;
+  color:rgba(255,255,255,0.45);
+  white-space:nowrap;
+  transition:all 0.3s ease;
+  pointer-events:none;
+  letter-spacing:0.5px;
+}
+
+/* HOVER EFFECTS */
+
+.star-group:hover{
+  z-index:500;
+}
+
+.star-group:hover .star{
+  transform:scale(2.6);
+  box-shadow:
+    0 0 12px white,
+    0 0 25px rgba(255,255,255,0.9),
+    0 0 60px rgba(100,150,255,0.8);
+}
+
+.star-group:hover .label{
+  color:white;
+  font-size:1rem;
+  text-shadow:
+    0 0 8px white,
+    0 0 18px rgba(100,150,255,0.8);
+  transform:translateY(-4px);
+}
+
+/* CONSTELLATION LINES */
+
+svg{
+  position:absolute;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+}
+
+line{
+  stroke:rgba(180,210,255,0.45);
+  stroke-width:1.2;
+  filter:drop-shadow(0 0 6px rgba(180,220,255,0.8));
+}
+
+/* INFO PANEL */
+
+.info-panel{
+  position:absolute;
+  right:30px;
+  bottom:30px;
+  width:320px;
+  padding:20px;
+  border-radius:18px;
+  backdrop-filter:blur(10px);
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.1);
+  color:rgba(255,255,255,0.85);
+  z-index:999;
+  box-shadow:
+    0 0 30px rgba(0,0,0,0.4);
+}
+
+.info-panel h2{
+  margin-bottom:10px;
+  font-weight:400;
+  letter-spacing:1px;
+}
+
+/* SHOOTING STAR */
+
+.shooting-star{
+  position:absolute;
+  width:180px;
+  height:2px;
+  background:linear-gradient(to right, white, transparent);
+  opacity:0;
+  transform:rotate(-25deg);
+  animation:shooting 10s linear infinite;
+}
+
+/* ANIMATIONS */
+
+@keyframes twinkle{
+  0%{ opacity:0.4; }
+  50%{ opacity:1; }
+  100%{ opacity:0.4; }
+}
+
+@keyframes shooting{
+  0%{
+    top:-10%;
+    left:-20%;
+    opacity:0;
   }
 
-  h1 {
-    position: absolute;
-    top: 20px;
-    width: 100%;
-    text-align: center;
-    font-size: 2.5rem;
-    letter-spacing: 3px;
-    z-index: 100;
-    color: rgba(255,255,255,0.95);
-    text-shadow: 0 0 12px rgba(255,255,255,0.5);
+  5%{
+    opacity:1;
   }
 
-  .sky {
-    position: relative;
-    width: 100vw;
-    height: 100vh;
+  15%{
+    top:40%;
+    left:120%;
+    opacity:0;
   }
 
-  .star-group {
-    position: absolute;
-    transform: translate(-50%, -50%);
-    text-align: center;
+  100%{
+    top:40%;
+    left:120%;
+    opacity:0;
   }
+}
 
-  .star {
-    width: 8px;
-    height: 8px;
-    margin: auto;
-    border-radius: 50%;
-    background: white;
-    box-shadow: 0 0 10px rgba(255,255,255,0.8);
-    animation: twinkle 3s infinite ease-in-out;
-    transition: all 0.25s ease;
-  }
-
-  .label {
-    margin-top: 8px;
-    font-size: 0.8rem;
-    color: rgba(255,255,255,0.55);
-    transition: all 0.25s ease;
-    white-space: nowrap;
-    pointer-events: none;
-  }
-
-  .star-group:hover .star {
-    transform: scale(2.2);
-    box-shadow:
-      0 0 15px white,
-      0 0 30px rgba(255,255,255,0.8);
-  }
-
-  .star-group:hover .label {
-    color: rgba(255,255,255,1);
-    font-size: 1rem;
-    text-shadow: 0 0 10px white;
-  }
-
-  svg {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-  }
-
-  line {
-    stroke: rgba(255,255,255,0.35);
-    stroke-width: 1;
-  }
-
-  @keyframes twinkle {
-    0% { opacity: 0.6; }
-    50% { opacity: 1; }
-    100% { opacity: 0.6; }
-  }
 </style>
 </head>
 
 <body>
 
-<h1>Southern Night Sky — Interactive Constellation Map</h1>
+<h1>Southern Night Sky</h1>
 
-<div class="sky">
+<div class="sky" id="sky">
+
+  <!-- SHOOTING STAR -->
+  <div class="shooting-star"></div>
 
   <!-- CONSTELLATION LINES -->
   <svg>
 
-    <!-- Puppis -->
-    <line x1="20%" y1="55%" x2="30%" y2="48%"/>
-    <line x1="30%" y1="48%" x2="40%" y2="60%"/>
-    <line x1="40%" y1="60%" x2="48%" y2="52%"/>
+    <!-- PUPPIS -->
+    <line x1="18%" y1="58%" x2="28%" y2="48%"/>
+    <line x1="28%" y1="48%" x2="38%" y2="62%"/>
+    <line x1="38%" y1="62%" x2="48%" y2="52%"/>
 
-    <!-- Orion -->
-    <line x1="65%" y1="25%" x2="70%" y2="35%"/>
-    <line x1="70%" y1="35%" x2="75%" y2="45%"/>
+    <!-- ORION -->
+    <line x1="65%" y1="24%" x2="70%" y2="35%"/>
+    <line x1="70%" y1="35%" x2="75%" y2="46%"/>
     <line x1="60%" y1="40%" x2="80%" y2="40%"/>
 
-    <!-- Crux -->
-    <line x1="82%" y1="65%" x2="86%" y2="75%"/>
-    <line x1="86%" y1="75%" x2="90%" y2="65%"/>
-    <line x1="86%" y1="70%" x2="86%" y2="80%"/>
+    <!-- CRUX -->
+    <line x1="82%" y1="66%" x2="86%" y2="75%"/>
+    <line x1="86%" y1="75%" x2="90%" y2="66%"/>
+    <line x1="86%" y1="70%" x2="86%" y2="82%"/>
 
-    <!-- Canis Major -->
-    <line x1="55%" y1="70%" x2="62%" y2="65%"/>
-    <line x1="62%" y1="65%" x2="68%" y2="72%"/>
+    <!-- CANIS MAJOR -->
+    <line x1="54%" y1="72%" x2="61%" y2="65%"/>
+    <line x1="61%" y1="65%" x2="69%" y2="72%"/>
 
   </svg>
 
   <!-- PUPPIS -->
-  <div class="star-group" style="left:20%; top:55%;">
-    <div class="star"></div>
-    <div class="label">Naos — Bright supergiant in Puppis</div>
+
+  <div class="star-group" style="left:18%; top:58%;">
+    <div class="star large"></div>
+    <div class="label">Naos — Blue supergiant</div>
   </div>
 
-  <div class="star-group" style="left:30%; top:48%;">
-    <div class="star"></div>
-    <div class="label">Suhail — Ancient navigational star</div>
+  <div class="star-group" style="left:28%; top:48%;">
+    <div class="star medium"></div>
+    <div class="label">Suhail — Ancient navigation star</div>
   </div>
 
-  <div class="star-group" style="left:40%; top:60%;">
-    <div class="star"></div>
-    <div class="label">Tureis — Yellow-white giant star</div>
+  <div class="star-group" style="left:38%; top:62%;">
+    <div class="star medium"></div>
+    <div class="label">Tureis — Yellow-white giant</div>
   </div>
 
   <div class="star-group" style="left:48%; top:52%;">
-    <div class="star"></div>
+    <div class="star small"></div>
     <div class="label">Azmidi — Binary star system</div>
   </div>
 
   <!-- ORION -->
-  <div class="star-group" style="left:65%; top:25%;">
-    <div class="star"></div>
+
+  <div class="star-group" style="left:65%; top:24%;">
+    <div class="star large"></div>
     <div class="label">Betelgeuse — Red supergiant</div>
   </div>
 
   <div class="star-group" style="left:70%; top:35%;">
-    <div class="star"></div>
-    <div class="label">Alnilam — Orion’s Belt center star</div>
+    <div class="star medium"></div>
+    <div class="label">Alnilam — Belt star</div>
   </div>
 
-  <div class="star-group" style="left:75%; top:45%;">
-    <div class="star"></div>
+  <div class="star-group" style="left:75%; top:46%;">
+    <div class="star large"></div>
     <div class="label">Rigel — Blue supergiant</div>
   </div>
 
   <div class="star-group" style="left:60%; top:40%;">
-    <div class="star"></div>
-    <div class="label">Bellatrix — Warrior Star</div>
+    <div class="star medium"></div>
+    <div class="label">Bellatrix — Warrior star</div>
   </div>
 
   <div class="star-group" style="left:80%; top:40%;">
-    <div class="star"></div>
+    <div class="star medium"></div>
     <div class="label">Saiph — Bright southern star</div>
   </div>
 
   <!-- CRUX -->
-  <div class="star-group" style="left:82%; top:65%;">
-    <div class="star"></div>
+
+  <div class="star-group" style="left:82%; top:66%;">
+    <div class="star medium"></div>
     <div class="label">Mimosa — Blue giant</div>
   </div>
 
   <div class="star-group" style="left:86%; top:75%;">
-    <div class="star"></div>
+    <div class="star large"></div>
     <div class="label">Acrux — Brightest in Crux</div>
   </div>
 
-  <div class="star-group" style="left:90%; top:65%;">
-    <div class="star"></div>
-    <div class="label">Gacrux — Red giant star</div>
+  <div class="star-group" style="left:90%; top:66%;">
+    <div class="star medium"></div>
+    <div class="label">Gacrux — Red giant</div>
   </div>
 
   <!-- CANIS MAJOR -->
-  <div class="star-group" style="left:55%; top:70%;">
-    <div class="star"></div>
-    <div class="label">Sirius — Brightest night sky star</div>
+
+  <div class="star-group" style="left:54%; top:72%;">
+    <div class="star large"></div>
+    <div class="label">Sirius — Brightest star in night sky</div>
   </div>
 
-  <div class="star-group" style="left:62%; top:65%;">
-    <div class="star"></div>
-    <div class="label">Adhara — Extremely luminous star</div>
+  <div class="star-group" style="left:61%; top:65%;">
+    <div class="star medium"></div>
+    <div class="label">Adhara — Extremely luminous</div>
   </div>
 
-  <div class="star-group" style="left:68%; top:72%;">
-    <div class="star"></div>
+  <div class="star-group" style="left:69%; top:72%;">
+    <div class="star medium"></div>
     <div class="label">Wezen — Yellow supergiant</div>
   </div>
 
 </div>
+
+<!-- INFO PANEL -->
+
+<div class="info-panel">
+  <h2>Interactive Sky</h2>
+  <p>
+    Move your mouse to tilt the sky in 3D space.
+    Hover over stars to reveal brighter labels and glow effects.
+    Includes Puppis, Orion, Crux, and Canis Major in approximate southern-sky positions.
+  </p>
+</div>
+
+<script>
+
+/* GENERATE BACKGROUND STARS */
+
+const sky = document.getElementById("sky");
+
+for(let i = 0; i < 180; i++){
+
+  const star = document.createElement("div");
+
+  star.classList.add("background-star");
+
+  const size = Math.random() * 3;
+
+  star.style.width = size + "px";
+  star.style.height = size + "px";
+
+  star.style.left = Math.random() * 100 + "%";
+  star.style.top = Math.random() * 100 + "%";
+
+  star.style.animationDuration =
+    (2 + Math.random() * 5) + "s";
+
+  sky.appendChild(star);
+}
+
+/* 3D PARALLAX EFFECT */
+
+document.addEventListener("mousemove", (e)=>{
+
+  const x =
+    (e.clientX / window.innerWidth - 0.5);
+
+  const y =
+    (e.clientY / window.innerHeight - 0.5);
+
+  sky.style.transform =
+    `
+    rotateY(${x * 10}deg)
+    rotateX(${-y * 10}deg)
+    `;
+
+  const stars =
+    document.querySelectorAll(".star-group");
+
+  stars.forEach((star, index)=>{
+
+    const depth =
+      (index % 5 + 1) * 2;
+
+    star.style.transform =
+      `
+      translate(-50%, -50%)
+      translateX(${x * depth * 8}px)
+      translateY(${y * depth * 8}px)
+      `;
+  });
+
+});
+
+</script>
 
 </body>
 </html>
