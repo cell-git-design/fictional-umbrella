@@ -4,62 +4,56 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>3D Night Sky</title>
+<title>3D Constellation Viewer</title>
 
 <style>
 
-html, body{
-  margin:0;
-  overflow:hidden;
-  background:black;
-  font-family:Arial, sans-serif;
+html, body {
+  margin: 0;
+  overflow: hidden;
+  background: black;
+  font-family: Arial, sans-serif;
 }
 
-canvas{
-  display:block;
+canvas {
+  display: block;
 }
 
-#title{
-  position:absolute;
-  top:20px;
-  width:100%;
-  text-align:center;
-  color:white;
-  font-size:2rem;
-  letter-spacing:4px;
-  z-index:10;
-  pointer-events:none;
-  text-shadow:
-    0 0 10px white,
-    0 0 30px rgba(100,150,255,0.6);
+#title {
+  position: absolute;
+  top: 20px;
+  width: 100%;
+  text-align: center;
+  color: white;
+  font-size: 2rem;
+  letter-spacing: 3px;
+  z-index: 10;
+  pointer-events: none;
 }
 
-#label{
-  position:absolute;
-  color:white;
-  background:rgba(0,0,0,0.7);
-  padding:10px 14px;
-  border-radius:10px;
-  pointer-events:none;
-  display:none;
-  z-index:20;
-  border:1px solid rgba(255,255,255,0.15);
-  backdrop-filter:blur(8px);
+#info {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 280px;
+  padding: 16px;
+  color: white;
+  background: rgba(255,255,255,0.08);
+  border-radius: 12px;
+  z-index: 10;
+  line-height: 1.5;
+  backdrop-filter: blur(8px);
 }
 
-#info{
-  position:absolute;
-  bottom:25px;
-  right:25px;
-  width:300px;
-  padding:18px;
-  border-radius:16px;
-  color:white;
-  background:rgba(255,255,255,0.06);
-  border:1px solid rgba(255,255,255,0.08);
-  backdrop-filter:blur(8px);
-  z-index:10;
-  line-height:1.5;
+#label {
+  position: absolute;
+  display: none;
+  color: white;
+  background: rgba(0,0,0,0.7);
+  padding: 10px;
+  border-radius: 10px;
+  pointer-events: none;
+  z-index: 20;
 }
 
 </style>
@@ -68,41 +62,37 @@ canvas{
 <body>
 
 <div id="title">
-  Immersive 3D Night Sky
+  Interactive 3D Night Sky
 </div>
-
-<div id="label"></div>
 
 <div id="info">
   Drag to rotate the sky.<br>
   Scroll to zoom.<br>
-  Hover stars for constellation info.
+  Hover stars for details.
 </div>
+
+<div id="label"></div>
 
 <script type="module">
 
-import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160/build/three.module.js';
+import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.160/examples/jsm/controls/OrbitControls.js';
 
-import { OrbitControls }
-from "https://unpkg.com/three@0.160.0/examples/jsm/controls/OrbitControls.js";
-
-/* ------------------ */
 /* SCENE */
-/* ------------------ */
 
 const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera(
   75,
-  window.innerWidth/window.innerHeight,
+  window.innerWidth / window.innerHeight,
   0.1,
   5000
 );
 
-camera.position.set(0,0,1);
+camera.position.z = 5;
 
 const renderer = new THREE.WebGLRenderer({
-  antialias:true
+  antialias: true
 });
 
 renderer.setSize(
@@ -110,223 +100,157 @@ renderer.setSize(
   window.innerHeight
 );
 
-renderer.setPixelRatio(window.devicePixelRatio);
-
 document.body.appendChild(renderer.domElement);
 
-/* ------------------ */
 /* CONTROLS */
-/* ------------------ */
 
-const controls =
-  new OrbitControls(
-    camera,
-    renderer.domElement
-  );
+const controls = new OrbitControls(
+  camera,
+  renderer.domElement
+);
 
 controls.enableDamping = true;
-controls.dampingFactor = 0.05;
 controls.enablePan = false;
-controls.rotateSpeed = 0.5;
 
-/* ------------------ */
 /* STARFIELD */
-/* ------------------ */
 
-const starGeometry =
-  new THREE.BufferGeometry();
+const starGeometry = new THREE.BufferGeometry();
 
 const starVertices = [];
 
-for(let i=0;i<8000;i++){
+for(let i = 0; i < 10000; i++){
 
-  const radius = 2000;
+  const x = (Math.random() - 0.5) * 3000;
+  const y = (Math.random() - 0.5) * 3000;
+  const z = (Math.random() - 0.5) * 3000;
 
-  const theta =
-    Math.random() * Math.PI * 2;
-
-  const phi =
-    Math.acos(
-      (Math.random()*2)-1
-    );
-
-  const x =
-    radius *
-    Math.sin(phi) *
-    Math.cos(theta);
-
-  const y =
-    radius *
-    Math.sin(phi) *
-    Math.sin(theta);
-
-  const z =
-    radius *
-    Math.cos(phi);
-
-  starVertices.push(x,y,z);
+  starVertices.push(x, y, z);
 }
 
 starGeometry.setAttribute(
-  "position",
+  'position',
   new THREE.Float32BufferAttribute(
     starVertices,
     3
   )
 );
 
-const starMaterial =
-  new THREE.PointsMaterial({
-    color:0xffffff,
-    size:2
-  });
+const starMaterial = new THREE.PointsMaterial({
+  color: 0xffffff,
+  size: 2
+});
 
-const stars =
-  new THREE.Points(
-    starGeometry,
-    starMaterial
-  );
+const stars = new THREE.Points(
+  starGeometry,
+  starMaterial
+);
 
 scene.add(stars);
 
-/* ------------------ */
 /* CONSTELLATION STARS */
-/* ------------------ */
 
-const constellationData = [
+const texture = new THREE.TextureLoader().load(
+  'https://threejs.org/examples/textures/sprites/disc.png'
+);
+
+const starData = [
 
 {
-  name:"Betelgeuse",
-  desc:"Red supergiant in Orion",
-  color:0xff8844,
-  position:[600,300,-700],
-  size:16
+  name: "Sirius",
+  desc: "Brightest star in the night sky",
+  color: 0xffffff,
+  pos: [120, 50, -300],
+  size: 25
 },
 
 {
-  name:"Rigel",
-  desc:"Blue supergiant in Orion",
-  color:0x99ccff,
-  position:[700,-150,-650],
-  size:14
+  name: "Betelgeuse",
+  desc: "Red supergiant in Orion",
+  color: 0xff8844,
+  pos: [-200, 120, -400],
+  size: 30
 },
 
 {
-  name:"Sirius",
-  desc:"Brightest star in night sky",
-  color:0xffffff,
-  position:[-400,-250,-800],
-  size:18
+  name: "Rigel",
+  desc: "Blue supergiant in Orion",
+  color: 0x99ccff,
+  pos: [-150, -100, -350],
+  size: 24
 },
 
 {
-  name:"Acrux",
-  desc:"Brightest star in Crux",
-  color:0xaaccff,
-  position:[-700,-500,400],
-  size:15
+  name: "Acrux",
+  desc: "Brightest star in Crux",
+  color: 0xaaddff,
+  pos: [300, -200, -450],
+  size: 26
 },
 
 {
-  name:"Antares",
-  desc:"Red supergiant in Scorpius",
-  color:0xff5533,
-  position:[500,100,700],
-  size:17
-},
-
-{
-  name:"Aldebaran",
-  desc:"Orange giant in Taurus",
-  color:0xffaa66,
-  position:[-600,400,500],
-  size:14
-},
-
-{
-  name:"Naos",
-  desc:"Blue supergiant in Puppis",
-  color:0xaaddff,
-  position:[300,-450,600],
-  size:13
+  name: "Antares",
+  desc: "Red supergiant in Scorpius",
+  color: 0xff5533,
+  pos: [350, 100, 200],
+  size: 28
 }
 
 ];
 
-const interactiveStars = [];
+const clickableStars = [];
 
-const texture =
-  new THREE.TextureLoader().load(
-    "https://threejs.org/examples/textures/sprites/disc.png"
-  );
+starData.forEach(data => {
 
-constellationData.forEach(star=>{
+  const material = new THREE.SpriteMaterial({
+    map: texture,
+    color: data.color,
+    transparent: true,
+    blending: THREE.AdditiveBlending
+  });
 
-  const material =
-    new THREE.SpriteMaterial({
-      map:texture,
-      color:star.color,
-      transparent:true,
-      blending:THREE.AdditiveBlending
-    });
+  const sprite = new THREE.Sprite(material);
 
-  const sprite =
-    new THREE.Sprite(material);
-
-  sprite.position.set(
-    ...star.position
-  );
+  sprite.position.set(...data.pos);
 
   sprite.scale.set(
-    star.size,
-    star.size,
+    data.size,
+    data.size,
     1
   );
 
   sprite.userData = {
-    name:star.name,
-    desc:star.desc,
-    baseSize:star.size
+    name: data.name,
+    desc: data.desc,
+    size: data.size
   };
 
   scene.add(sprite);
 
-  interactiveStars.push(sprite);
+  clickableStars.push(sprite);
 
 });
 
-/* ------------------ */
-/* HOVER INTERACTION */
-/* ------------------ */
+/* HOVER */
 
-const raycaster =
-  new THREE.Raycaster();
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
 
-const mouse =
-  new THREE.Vector2();
+const label = document.getElementById("label");
 
-const label =
-  document.getElementById("label");
+let mx = 0;
+let my = 0;
 
-let mouseX = 0;
-let mouseY = 0;
+window.addEventListener("mousemove", e => {
 
-window.addEventListener("mousemove",(e)=>{
+  mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
 
-  mouse.x =
-    (e.clientX/window.innerWidth)*2-1;
-
-  mouse.y =
-    -(e.clientY/window.innerHeight)*2+1;
-
-  mouseX = e.clientX;
-  mouseY = e.clientY;
+  mx = e.clientX;
+  my = e.clientY;
 
 });
 
-/* ------------------ */
-/* ANIMATE */
-/* ------------------ */
+/* ANIMATION */
 
 function animate(){
 
@@ -334,23 +258,17 @@ function animate(){
 
   controls.update();
 
-  stars.rotation.y += 0.00015;
+  stars.rotation.y += 0.0002;
 
-  raycaster.setFromCamera(
-    mouse,
-    camera
-  );
+  raycaster.setFromCamera(mouse, camera);
 
-  const intersects =
-    raycaster.intersectObjects(
-      interactiveStars
-    );
+  const intersects = raycaster.intersectObjects(clickableStars);
 
-  interactiveStars.forEach(star=>{
+  clickableStars.forEach(star => {
 
     star.scale.set(
-      star.userData.baseSize,
-      star.userData.baseSize,
+      star.userData.size,
+      star.userData.size,
       1
     );
 
@@ -358,22 +276,18 @@ function animate(){
 
   if(intersects.length > 0){
 
-    const star =
-      intersects[0].object;
+    const star = intersects[0].object;
 
     star.scale.set(
-      star.userData.baseSize * 1.8,
-      star.userData.baseSize * 1.8,
+      star.userData.size * 1.5,
+      star.userData.size * 1.5,
       1
     );
 
     label.style.display = "block";
 
-    label.style.left =
-      mouseX + 20 + "px";
-
-    label.style.top =
-      mouseY - 20 + "px";
+    label.style.left = mx + 15 + "px";
+    label.style.top = my - 15 + "px";
 
     label.innerHTML =
       "<strong>" +
@@ -387,21 +301,18 @@ function animate(){
 
   }
 
-  renderer.render(scene,camera);
+  renderer.render(scene, camera);
 
 }
 
 animate();
 
-/* ------------------ */
 /* RESIZE */
-/* ------------------ */
 
-window.addEventListener("resize",()=>{
+window.addEventListener("resize", () => {
 
   camera.aspect =
-    window.innerWidth /
-    window.innerHeight;
+    window.innerWidth / window.innerHeight;
 
   camera.updateProjectionMatrix();
 
