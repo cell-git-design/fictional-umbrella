@@ -1,119 +1,208 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Puppis Constellation</title>
-  <style>
-    body {
-      margin: 0;
-      height: 100vh;
-      background: radial-gradient(ellipse at bottom, #000 0%, #111 100%);
-      color: white;
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    .sky {
-      position: relative;
-      width: 90%;
-      height: 90%;
-    }
+<title>Interactive Southern Sky Map</title>
 
-    .star {
-      position: absolute;
-      width: 10px;
-      height: 10px;
-      background: white;
-      border-radius: 50%;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
+<style>
+  body {
+    margin: 0;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at bottom, #101830 0%, #05070d 70%);
+    font-family: Arial, sans-serif;
+    color: white;
+  }
 
-    .star:hover {
-      transform: scale(2);
-      box-shadow: 0 0 15px 5px white;
-      z-index: 10;
-    }
+  h1 {
+    position: absolute;
+    top: 20px;
+    width: 100%;
+    text-align: center;
+    font-size: 2.5rem;
+    letter-spacing: 3px;
+    z-index: 100;
+    color: rgba(255,255,255,0.95);
+    text-shadow: 0 0 12px rgba(255,255,255,0.5);
+  }
 
-    .tooltip {
-      position: absolute;
-      background: rgba(0,0,0,0.8);
-      padding: 8px 12px;
-      border-radius: 6px;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.2s;
-      max-width: 200px;
-    }
+  .sky {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+  }
 
-    .star:hover + .tooltip {
-      opacity: 1;
-    }
+  .star-group {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
 
-    /* Optional: connecting lines between stars */
-    svg {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-    }
+  .star {
+    width: 8px;
+    height: 8px;
+    margin: auto;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 0 10px rgba(255,255,255,0.8);
+    animation: twinkle 3s infinite ease-in-out;
+    transition: all 0.25s ease;
+  }
 
-    line {
-      stroke: white;
-      stroke-width: 1;
-      opacity: 0.6;
-    }
-  </style>
+  .label {
+    margin-top: 8px;
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.55);
+    transition: all 0.25s ease;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  .star-group:hover .star {
+    transform: scale(2.2);
+    box-shadow:
+      0 0 15px white,
+      0 0 30px rgba(255,255,255,0.8);
+  }
+
+  .star-group:hover .label {
+    color: rgba(255,255,255,1);
+    font-size: 1rem;
+    text-shadow: 0 0 10px white;
+  }
+
+  svg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  line {
+    stroke: rgba(255,255,255,0.35);
+    stroke-width: 1;
+  }
+
+  @keyframes twinkle {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+  }
+</style>
 </head>
+
 <body>
 
-  <div class="sky">
-    <!-- Stars with positions -->
-    <div class="star" style="top: 40%; left: 20%;" data-name="Naos" data-desc="Brightest star in Puppis."></div>
-    <div class="tooltip"></div>
+<h1>Southern Night Sky — Interactive Constellation Map</h1>
 
-    <div class="star" style="top: 50%; left: 35%;" data-name="Suhail" data-desc="Second brightest star."></div>
-    <div class="tooltip"></div>
+<div class="sky">
 
-    <div class="star" style="top: 60%; left: 50%;" data-name="Yed Posterior" data-desc="Moderate brightness star."></div>
-    <div class="tooltip"></div>
+  <!-- CONSTELLATION LINES -->
+  <svg>
 
-    <div class="star" style="top: 45%; left: 65%;" data-name="Muhlifain" data-desc="Faint star in the constellation."></div>
-    <div class="tooltip"></div>
+    <!-- Puppis -->
+    <line x1="20%" y1="55%" x2="30%" y2="48%"/>
+    <line x1="30%" y1="48%" x2="40%" y2="60%"/>
+    <line x1="40%" y1="60%" x2="48%" y2="52%"/>
 
-    <!-- Optional lines connecting stars -->
-    <svg>
-      <line x1="20%" y1="40%" x2="35%" y2="50%"></line>
-      <line x1="35%" y1="50%" x2="50%" y2="60%"></line>
-      <line x1="50%" y1="60%" x2="65%" y2="45%"></line>
-    </svg>
+    <!-- Orion -->
+    <line x1="65%" y1="25%" x2="70%" y2="35%"/>
+    <line x1="70%" y1="35%" x2="75%" y2="45%"/>
+    <line x1="60%" y1="40%" x2="80%" y2="40%"/>
+
+    <!-- Crux -->
+    <line x1="82%" y1="65%" x2="86%" y2="75%"/>
+    <line x1="86%" y1="75%" x2="90%" y2="65%"/>
+    <line x1="86%" y1="70%" x2="86%" y2="80%"/>
+
+    <!-- Canis Major -->
+    <line x1="55%" y1="70%" x2="62%" y2="65%"/>
+    <line x1="62%" y1="65%" x2="68%" y2="72%"/>
+
+  </svg>
+
+  <!-- PUPPIS -->
+  <div class="star-group" style="left:20%; top:55%;">
+    <div class="star"></div>
+    <div class="label">Naos — Bright supergiant in Puppis</div>
   </div>
 
-  <script>
-    const stars = document.querySelectorAll('.star');
-    const tooltips = document.querySelectorAll('.tooltip');
+  <div class="star-group" style="left:30%; top:48%;">
+    <div class="star"></div>
+    <div class="label">Suhail — Ancient navigational star</div>
+  </div>
 
-    stars.forEach((star, i) => {
-      star.addEventListener('mousemove', (e) => {
-        const tooltip = tooltips[i];
-        tooltip.style.left = e.offsetX + 15 + 'px';
-        tooltip.style.top = e.offsetY - 15 + 'px';
-        tooltip.innerHTML = `<strong>${star.dataset.name}</strong><br>${star.dataset.desc}`;
-      });
+  <div class="star-group" style="left:40%; top:60%;">
+    <div class="star"></div>
+    <div class="label">Tureis — Yellow-white giant star</div>
+  </div>
 
-      star.addEventListener('mouseenter', () => {
-        tooltips[i].style.opacity = '1';
-      });
+  <div class="star-group" style="left:48%; top:52%;">
+    <div class="star"></div>
+    <div class="label">Azmidi — Binary star system</div>
+  </div>
 
-      star.addEventListener('mouseleave', () => {
-        tooltips[i].style.opacity = '0';
-      });
-    });
-  </script>
+  <!-- ORION -->
+  <div class="star-group" style="left:65%; top:25%;">
+    <div class="star"></div>
+    <div class="label">Betelgeuse — Red supergiant</div>
+  </div>
+
+  <div class="star-group" style="left:70%; top:35%;">
+    <div class="star"></div>
+    <div class="label">Alnilam — Orion’s Belt center star</div>
+  </div>
+
+  <div class="star-group" style="left:75%; top:45%;">
+    <div class="star"></div>
+    <div class="label">Rigel — Blue supergiant</div>
+  </div>
+
+  <div class="star-group" style="left:60%; top:40%;">
+    <div class="star"></div>
+    <div class="label">Bellatrix — Warrior Star</div>
+  </div>
+
+  <div class="star-group" style="left:80%; top:40%;">
+    <div class="star"></div>
+    <div class="label">Saiph — Bright southern star</div>
+  </div>
+
+  <!-- CRUX -->
+  <div class="star-group" style="left:82%; top:65%;">
+    <div class="star"></div>
+    <div class="label">Mimosa — Blue giant</div>
+  </div>
+
+  <div class="star-group" style="left:86%; top:75%;">
+    <div class="star"></div>
+    <div class="label">Acrux — Brightest in Crux</div>
+  </div>
+
+  <div class="star-group" style="left:90%; top:65%;">
+    <div class="star"></div>
+    <div class="label">Gacrux — Red giant star</div>
+  </div>
+
+  <!-- CANIS MAJOR -->
+  <div class="star-group" style="left:55%; top:70%;">
+    <div class="star"></div>
+    <div class="label">Sirius — Brightest night sky star</div>
+  </div>
+
+  <div class="star-group" style="left:62%; top:65%;">
+    <div class="star"></div>
+    <div class="label">Adhara — Extremely luminous star</div>
+  </div>
+
+  <div class="star-group" style="left:68%; top:72%;">
+    <div class="star"></div>
+    <div class="label">Wezen — Yellow supergiant</div>
+  </div>
+
+</div>
 
 </body>
 </html>
