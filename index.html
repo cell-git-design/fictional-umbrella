@@ -1,59 +1,216 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<title>3D Constellation Viewer</title>
+<title>Interactive Southern Sky</title>
 
 <style>
 
-html, body {
-  margin: 0;
-  overflow: hidden;
-  background: black;
-  font-family: Arial, sans-serif;
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
 }
 
-canvas {
-  display: block;
+body{
+  overflow:hidden;
+  background:
+    radial-gradient(circle at bottom,
+    #16213d 0%,
+    #090b14 40%,
+    #020305 100%);
+  font-family:Arial, sans-serif;
+  height:100vh;
+  color:white;
 }
 
-#title {
-  position: absolute;
-  top: 20px;
-  width: 100%;
-  text-align: center;
-  color: white;
-  font-size: 2rem;
-  letter-spacing: 3px;
-  z-index: 10;
-  pointer-events: none;
+/* TITLE */
+
+h1{
+  position:absolute;
+  top:18px;
+  width:100%;
+  text-align:center;
+  z-index:1000;
+  font-size:2.6rem;
+  letter-spacing:4px;
+  font-weight:300;
+  color:rgba(255,255,255,0.92);
+  text-shadow:
+    0 0 10px rgba(255,255,255,0.7),
+    0 0 30px rgba(120,160,255,0.5);
 }
 
-#info {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  width: 280px;
-  padding: 16px;
-  color: white;
-  background: rgba(255,255,255,0.08);
-  border-radius: 12px;
-  z-index: 10;
-  line-height: 1.5;
-  backdrop-filter: blur(8px);
+/* SKY */
+
+.sky{
+  position:relative;
+  width:100vw;
+  height:100vh;
+  transform-style:preserve-3d;
+  transition:transform 0.15s linear;
+  perspective:1200px;
 }
 
-#label {
-  position: absolute;
-  display: none;
-  color: white;
-  background: rgba(0,0,0,0.7);
-  padding: 10px;
-  border-radius: 10px;
-  pointer-events: none;
-  z-index: 20;
+/* BACKGROUND STARS */
+
+.background-star{
+  position:absolute;
+  border-radius:50%;
+  background:white;
+  opacity:0.7;
+  animation:twinkle linear infinite;
+}
+
+/* MAIN STAR GROUP */
+
+.star-group{
+  position:absolute;
+  transform-style:preserve-3d;
+  transform:translate(-50%, -50%);
+  transition:transform 0.15s ease;
+  text-align:center;
+}
+
+/* STARS */
+
+.star{
+  margin:auto;
+  border-radius:50%;
+  background:
+    radial-gradient(circle,
+    rgba(255,255,255,1) 0%,
+    rgba(255,255,255,0.9) 20%,
+    rgba(255,255,255,0.2) 60%,
+    rgba(255,255,255,0) 100%);
+  animation:twinkle 3s ease-in-out infinite;
+  transition:all 0.3s ease;
+}
+
+/* STAR SIZES */
+
+.small{ width:6px; height:6px; }
+.medium{ width:10px; height:10px; }
+.large{ width:16px; height:16px; }
+
+/* LABELS */
+
+.label{
+  margin-top:10px;
+  font-size:0.78rem;
+  color:rgba(255,255,255,0.45);
+  white-space:nowrap;
+  transition:all 0.3s ease;
+  pointer-events:none;
+  letter-spacing:0.5px;
+}
+
+/* HOVER EFFECTS */
+
+.star-group:hover{
+  z-index:500;
+}
+
+.star-group:hover .star{
+  transform:scale(2.6);
+  box-shadow:
+    0 0 12px white,
+    0 0 25px rgba(255,255,255,0.9),
+    0 0 60px rgba(100,150,255,0.8);
+}
+
+.star-group:hover .label{
+  color:white;
+  font-size:1rem;
+  text-shadow:
+    0 0 8px white,
+    0 0 18px rgba(100,150,255,0.8);
+  transform:translateY(-4px);
+}
+
+/* CONSTELLATION LINES */
+
+svg{
+  position:absolute;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+}
+
+line{
+  stroke:rgba(180,210,255,0.45);
+  stroke-width:1.2;
+  filter:drop-shadow(0 0 6px rgba(180,220,255,0.8));
+}
+
+/* INFO PANEL */
+
+.info-panel{
+  position:absolute;
+  right:30px;
+  bottom:30px;
+  width:320px;
+  padding:20px;
+  border-radius:18px;
+  backdrop-filter:blur(10px);
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.1);
+  color:rgba(255,255,255,0.85);
+  z-index:999;
+  box-shadow:
+    0 0 30px rgba(0,0,0,0.4);
+}
+
+.info-panel h2{
+  margin-bottom:10px;
+  font-weight:400;
+  letter-spacing:1px;
+}
+
+/* SHOOTING STAR */
+
+.shooting-star{
+  position:absolute;
+  width:180px;
+  height:2px;
+  background:linear-gradient(to right, white, transparent);
+  opacity:0;
+  transform:rotate(-25deg);
+  animation:shooting 10s linear infinite;
+}
+
+/* ANIMATIONS */
+
+@keyframes twinkle{
+  0%{ opacity:0.4; }
+  50%{ opacity:1; }
+  100%{ opacity:0.4; }
+}
+
+@keyframes shooting{
+  0%{
+    top:-10%;
+    left:-20%;
+    opacity:0;
+  }
+
+  5%{
+    opacity:1;
+  }
+
+  15%{
+    top:40%;
+    left:120%;
+    opacity:0;
+  }
+
+  100%{
+    top:40%;
+    left:120%;
+    opacity:0;
+  }
 }
 
 </style>
@@ -61,265 +218,190 @@ canvas {
 
 <body>
 
-<div id="title">
-  Interactive 3D Night Sky
+<h1>Southern Night Sky</h1>
+
+<div class="sky" id="sky">
+
+  <!-- SHOOTING STAR -->
+  <div class="shooting-star"></div>
+
+  <!-- CONSTELLATION LINES -->
+  <svg>
+
+    <!-- PUPPIS -->
+    <line x1="18%" y1="58%" x2="28%" y2="48%"/>
+    <line x1="28%" y1="48%" x2="38%" y2="62%"/>
+    <line x1="38%" y1="62%" x2="48%" y2="52%"/>
+
+    <!-- ORION -->
+    <line x1="65%" y1="24%" x2="70%" y2="35%"/>
+    <line x1="70%" y1="35%" x2="75%" y2="46%"/>
+    <line x1="60%" y1="40%" x2="80%" y2="40%"/>
+
+    <!-- CRUX -->
+    <line x1="82%" y1="66%" x2="86%" y2="75%"/>
+    <line x1="86%" y1="75%" x2="90%" y2="66%"/>
+    <line x1="86%" y1="70%" x2="86%" y2="82%"/>
+
+    <!-- CANIS MAJOR -->
+    <line x1="54%" y1="72%" x2="61%" y2="65%"/>
+    <line x1="61%" y1="65%" x2="69%" y2="72%"/>
+
+  </svg>
+
+  <!-- PUPPIS -->
+
+  <div class="star-group" style="left:18%; top:58%;">
+    <div class="star large"></div>
+    <div class="label">Naos — Blue supergiant</div>
+  </div>
+
+  <div class="star-group" style="left:28%; top:48%;">
+    <div class="star medium"></div>
+    <div class="label">Suhail — Ancient navigation star</div>
+  </div>
+
+  <div class="star-group" style="left:38%; top:62%;">
+    <div class="star medium"></div>
+    <div class="label">Tureis — Yellow-white giant</div>
+  </div>
+
+  <div class="star-group" style="left:48%; top:52%;">
+    <div class="star small"></div>
+    <div class="label">Azmidi — Binary star system</div>
+  </div>
+
+  <!-- ORION -->
+
+  <div class="star-group" style="left:65%; top:24%;">
+    <div class="star large"></div>
+    <div class="label">Betelgeuse — Red supergiant</div>
+  </div>
+
+  <div class="star-group" style="left:70%; top:35%;">
+    <div class="star medium"></div>
+    <div class="label">Alnilam — Belt star</div>
+  </div>
+
+  <div class="star-group" style="left:75%; top:46%;">
+    <div class="star large"></div>
+    <div class="label">Rigel — Blue supergiant</div>
+  </div>
+
+  <div class="star-group" style="left:60%; top:40%;">
+    <div class="star medium"></div>
+    <div class="label">Bellatrix — Warrior star</div>
+  </div>
+
+  <div class="star-group" style="left:80%; top:40%;">
+    <div class="star medium"></div>
+    <div class="label">Saiph — Bright southern star</div>
+  </div>
+
+  <!-- CRUX -->
+
+  <div class="star-group" style="left:82%; top:66%;">
+    <div class="star medium"></div>
+    <div class="label">Mimosa — Blue giant</div>
+  </div>
+
+  <div class="star-group" style="left:86%; top:75%;">
+    <div class="star large"></div>
+    <div class="label">Acrux — Brightest in Crux</div>
+  </div>
+
+  <div class="star-group" style="left:90%; top:66%;">
+    <div class="star medium"></div>
+    <div class="label">Gacrux — Red giant</div>
+  </div>
+
+  <!-- CANIS MAJOR -->
+
+  <div class="star-group" style="left:54%; top:72%;">
+    <div class="star large"></div>
+    <div class="label">Sirius — Brightest star in night sky</div>
+  </div>
+
+  <div class="star-group" style="left:61%; top:65%;">
+    <div class="star medium"></div>
+    <div class="label">Adhara — Extremely luminous</div>
+  </div>
+
+  <div class="star-group" style="left:69%; top:72%;">
+    <div class="star medium"></div>
+    <div class="label">Wezen — Yellow supergiant</div>
+  </div>
+
 </div>
 
-<div id="info">
-  Drag to rotate the sky.<br>
-  Scroll to zoom.<br>
-  Hover stars for details.
+<!-- INFO PANEL -->
+
+<div class="info-panel">
+  <h2>Interactive Sky</h2>
+  <p>
+    Move your mouse to tilt the sky in 3D space.
+    Hover over stars to reveal brighter labels and glow effects.
+    Includes Puppis, Orion, Crux, and Canis Major in approximate southern-sky positions.
+  </p>
 </div>
 
-<div id="label"></div>
+<script>
 
-<script type="module">
+/* GENERATE BACKGROUND STARS */
 
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160/build/three.module.js';
-import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.160/examples/jsm/controls/OrbitControls.js';
+const sky = document.getElementById("sky");
 
-/* SCENE */
+for(let i = 0; i < 180; i++){
 
-const scene = new THREE.Scene();
+  const star = document.createElement("div");
 
-const camera = new THREE.PerspectiveCamera(
-  75,
-  window.innerWidth / window.innerHeight,
-  0.1,
-  5000
-);
+  star.classList.add("background-star");
 
-camera.position.z = 5;
+  const size = Math.random() * 3;
 
-const renderer = new THREE.WebGLRenderer({
-  antialias: true
-});
+  star.style.width = size + "px";
+  star.style.height = size + "px";
 
-renderer.setSize(
-  window.innerWidth,
-  window.innerHeight
-);
+  star.style.left = Math.random() * 100 + "%";
+  star.style.top = Math.random() * 100 + "%";
 
-document.body.appendChild(renderer.domElement);
+  star.style.animationDuration =
+    (2 + Math.random() * 5) + "s";
 
-/* CONTROLS */
-
-const controls = new OrbitControls(
-  camera,
-  renderer.domElement
-);
-
-controls.enableDamping = true;
-controls.enablePan = false;
-
-/* STARFIELD */
-
-const starGeometry = new THREE.BufferGeometry();
-
-const starVertices = [];
-
-for(let i = 0; i < 10000; i++){
-
-  const x = (Math.random() - 0.5) * 3000;
-  const y = (Math.random() - 0.5) * 3000;
-  const z = (Math.random() - 0.5) * 3000;
-
-  starVertices.push(x, y, z);
+  sky.appendChild(star);
 }
 
-starGeometry.setAttribute(
-  'position',
-  new THREE.Float32BufferAttribute(
-    starVertices,
-    3
-  )
-);
+/* 3D PARALLAX EFFECT */
 
-const starMaterial = new THREE.PointsMaterial({
-  color: 0xffffff,
-  size: 2
-});
+document.addEventListener("mousemove", (e)=>{
 
-const stars = new THREE.Points(
-  starGeometry,
-  starMaterial
-);
+  const x =
+    (e.clientX / window.innerWidth - 0.5);
 
-scene.add(stars);
+  const y =
+    (e.clientY / window.innerHeight - 0.5);
 
-/* CONSTELLATION STARS */
+  sky.style.transform =
+    `
+    rotateY(${x * 10}deg)
+    rotateX(${-y * 10}deg)
+    `;
 
-const texture = new THREE.TextureLoader().load(
-  'https://threejs.org/examples/textures/sprites/disc.png'
-);
+  const stars =
+    document.querySelectorAll(".star-group");
 
-const starData = [
+  stars.forEach((star, index)=>{
 
-{
-  name: "Sirius",
-  desc: "Brightest star in the night sky",
-  color: 0xffffff,
-  pos: [120, 50, -300],
-  size: 25
-},
+    const depth =
+      (index % 5 + 1) * 2;
 
-{
-  name: "Betelgeuse",
-  desc: "Red supergiant in Orion",
-  color: 0xff8844,
-  pos: [-200, 120, -400],
-  size: 30
-},
-
-{
-  name: "Rigel",
-  desc: "Blue supergiant in Orion",
-  color: 0x99ccff,
-  pos: [-150, -100, -350],
-  size: 24
-},
-
-{
-  name: "Acrux",
-  desc: "Brightest star in Crux",
-  color: 0xaaddff,
-  pos: [300, -200, -450],
-  size: 26
-},
-
-{
-  name: "Antares",
-  desc: "Red supergiant in Scorpius",
-  color: 0xff5533,
-  pos: [350, 100, 200],
-  size: 28
-}
-
-];
-
-const clickableStars = [];
-
-starData.forEach(data => {
-
-  const material = new THREE.SpriteMaterial({
-    map: texture,
-    color: data.color,
-    transparent: true,
-    blending: THREE.AdditiveBlending
+    star.style.transform =
+      `
+      translate(-50%, -50%)
+      translateX(${x * depth * 8}px)
+      translateY(${y * depth * 8}px)
+      `;
   });
-
-  const sprite = new THREE.Sprite(material);
-
-  sprite.position.set(...data.pos);
-
-  sprite.scale.set(
-    data.size,
-    data.size,
-    1
-  );
-
-  sprite.userData = {
-    name: data.name,
-    desc: data.desc,
-    size: data.size
-  };
-
-  scene.add(sprite);
-
-  clickableStars.push(sprite);
-
-});
-
-/* HOVER */
-
-const raycaster = new THREE.Raycaster();
-const mouse = new THREE.Vector2();
-
-const label = document.getElementById("label");
-
-let mx = 0;
-let my = 0;
-
-window.addEventListener("mousemove", e => {
-
-  mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-  mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-
-  mx = e.clientX;
-  my = e.clientY;
-
-});
-
-/* ANIMATION */
-
-function animate(){
-
-  requestAnimationFrame(animate);
-
-  controls.update();
-
-  stars.rotation.y += 0.0002;
-
-  raycaster.setFromCamera(mouse, camera);
-
-  const intersects = raycaster.intersectObjects(clickableStars);
-
-  clickableStars.forEach(star => {
-
-    star.scale.set(
-      star.userData.size,
-      star.userData.size,
-      1
-    );
-
-  });
-
-  if(intersects.length > 0){
-
-    const star = intersects[0].object;
-
-    star.scale.set(
-      star.userData.size * 1.5,
-      star.userData.size * 1.5,
-      1
-    );
-
-    label.style.display = "block";
-
-    label.style.left = mx + 15 + "px";
-    label.style.top = my - 15 + "px";
-
-    label.innerHTML =
-      "<strong>" +
-      star.userData.name +
-      "</strong><br>" +
-      star.userData.desc;
-
-  } else {
-
-    label.style.display = "none";
-
-  }
-
-  renderer.render(scene, camera);
-
-}
-
-animate();
-
-/* RESIZE */
-
-window.addEventListener("resize", () => {
-
-  camera.aspect =
-    window.innerWidth / window.innerHeight;
-
-  camera.updateProjectionMatrix();
-
-  renderer.setSize(
-    window.innerWidth,
-    window.innerHeight
-  );
 
 });
 
