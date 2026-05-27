@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Immersive 3D Constellation Map</title>
+<title>3D Night Sky</title>
 
 <style>
 
@@ -13,10 +13,11 @@ html, body{
   overflow:hidden;
   background:black;
   font-family:Arial, sans-serif;
-  height:100%;
 }
 
-/* TITLE */
+canvas{
+  display:block;
+}
 
 #title{
   position:absolute;
@@ -24,54 +25,41 @@ html, body{
   width:100%;
   text-align:center;
   color:white;
-  z-index:10;
-  font-size:2.2rem;
+  font-size:2rem;
   letter-spacing:4px;
-  font-weight:300;
-  text-shadow:
-    0 0 10px rgba(255,255,255,0.7),
-    0 0 30px rgba(100,150,255,0.6);
-  pointer-events:none;
-}
-
-/* INFO BOX */
-
-#info{
-  position:absolute;
-  bottom:30px;
-  right:30px;
-  width:320px;
-  padding:18px;
-  border-radius:18px;
-  background:rgba(255,255,255,0.06);
-  backdrop-filter:blur(10px);
-  border:1px solid rgba(255,255,255,0.1);
-  color:rgba(255,255,255,0.85);
   z-index:10;
-  line-height:1.5;
+  pointer-events:none;
+  text-shadow:
+    0 0 10px white,
+    0 0 30px rgba(100,150,255,0.6);
 }
-
-/* STAR LABEL */
 
 #label{
   position:absolute;
   color:white;
-  background:rgba(0,0,0,0.75);
+  background:rgba(0,0,0,0.7);
   padding:10px 14px;
   border-radius:10px;
   pointer-events:none;
-  transform:translate(-50%, -120%);
   display:none;
   z-index:20;
-  font-size:0.95rem;
   border:1px solid rgba(255,255,255,0.15);
-  backdrop-filter:blur(6px);
-  box-shadow:
-    0 0 15px rgba(255,255,255,0.15);
+  backdrop-filter:blur(8px);
 }
 
-canvas{
-  display:block;
+#info{
+  position:absolute;
+  bottom:25px;
+  right:25px;
+  width:300px;
+  padding:18px;
+  border-radius:16px;
+  color:white;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.08);
+  backdrop-filter:blur(8px);
+  z-index:10;
+  line-height:1.5;
 }
 
 </style>
@@ -80,55 +68,42 @@ canvas{
 <body>
 
 <div id="title">
-  Interactive 3D Night Sky
-</div>
-
-<div id="info">
-  <strong>Immersive Constellation Viewer</strong><br><br>
-
-  Drag to look around the celestial sphere.<br>
-  Scroll to zoom.<br>
-  Hover stars for details.<br><br>
-
-  Includes:
-  Orion, Crux, Puppis,
-  Scorpius, Taurus,
-  and Canis Major.
+  Immersive 3D Night Sky
 </div>
 
 <div id="label"></div>
 
-<!-- THREE.JS -->
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<div id="info">
+  Drag to rotate the sky.<br>
+  Scroll to zoom.<br>
+  Hover stars for constellation info.
+</div>
 
-<!-- ORBIT CONTROLS -->
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
+<script type="module">
 
-<script>
+import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
 
-/* ---------------------------
-SCENE SETUP
----------------------------- */
+import { OrbitControls }
+from "https://unpkg.com/three@0.160.0/examples/jsm/controls/OrbitControls.js";
+
+/* ------------------ */
+/* SCENE */
+/* ------------------ */
 
 const scene = new THREE.Scene();
 
-scene.fog =
-  new THREE.FogExp2(0x000000, 0.0007);
+const camera = new THREE.PerspectiveCamera(
+  75,
+  window.innerWidth/window.innerHeight,
+  0.1,
+  5000
+);
 
-const camera =
-  new THREE.PerspectiveCamera(
-    75,
-    window.innerWidth/window.innerHeight,
-    0.1,
-    5000
-  );
+camera.position.set(0,0,1);
 
-camera.position.set(0,0,0.1);
-
-const renderer =
-  new THREE.WebGLRenderer({
-    antialias:true
-  });
+const renderer = new THREE.WebGLRenderer({
+  antialias:true
+});
 
 renderer.setSize(
   window.innerWidth,
@@ -139,38 +114,36 @@ renderer.setPixelRatio(window.devicePixelRatio);
 
 document.body.appendChild(renderer.domElement);
 
-/* ---------------------------
-CONTROLS
----------------------------- */
+/* ------------------ */
+/* CONTROLS */
+/* ------------------ */
 
 const controls =
-  new THREE.OrbitControls(
+  new OrbitControls(
     camera,
     renderer.domElement
   );
 
-controls.enablePan = false;
 controls.enableDamping = true;
-controls.dampingFactor = 0.04;
-controls.rotateSpeed = 0.6;
-controls.minDistance = 0.1;
-controls.maxDistance = 2;
+controls.dampingFactor = 0.05;
+controls.enablePan = false;
+controls.rotateSpeed = 0.5;
 
-/* ---------------------------
-STARFIELD
----------------------------- */
+/* ------------------ */
+/* STARFIELD */
+/* ------------------ */
 
-const bgGeometry =
+const starGeometry =
   new THREE.BufferGeometry();
 
-const bgVertices = [];
+const starVertices = [];
 
-for(let i=0;i<5000;i++){
+for(let i=0;i<8000;i++){
 
-  const radius = 1800;
+  const radius = 2000;
 
   const theta =
-    Math.random()*Math.PI*2;
+    Math.random() * Math.PI * 2;
 
   const phi =
     Math.acos(
@@ -191,141 +164,107 @@ for(let i=0;i<5000;i++){
     radius *
     Math.cos(phi);
 
-  bgVertices.push(x,y,z);
+  starVertices.push(x,y,z);
 }
 
-bgGeometry.setAttribute(
-  'position',
+starGeometry.setAttribute(
+  "position",
   new THREE.Float32BufferAttribute(
-    bgVertices,
+    starVertices,
     3
   )
 );
 
-const bgMaterial =
+const starMaterial =
   new THREE.PointsMaterial({
     color:0xffffff,
-    size:2,
-    transparent:true,
-    opacity:0.8
+    size:2
   });
 
-const backgroundStars =
+const stars =
   new THREE.Points(
-    bgGeometry,
-    bgMaterial
+    starGeometry,
+    starMaterial
   );
 
-scene.add(backgroundStars);
+scene.add(stars);
 
-/* ---------------------------
-CONSTELLATION STARS
----------------------------- */
+/* ------------------ */
+/* CONSTELLATION STARS */
+/* ------------------ */
 
-const stars = [
+const constellationData = [
 
 {
   name:"Betelgeuse",
   desc:"Red supergiant in Orion",
-  color:0xff8855,
-  size:10,
-  theta:1.2,
-  phi:1.1
+  color:0xff8844,
+  position:[600,300,-700],
+  size:16
 },
 
 {
   name:"Rigel",
   desc:"Blue supergiant in Orion",
   color:0x99ccff,
-  size:9,
-  theta:1.35,
-  phi:1.4
+  position:[700,-150,-650],
+  size:14
 },
 
 {
   name:"Sirius",
-  desc:"Brightest night sky star",
+  desc:"Brightest star in night sky",
   color:0xffffff,
-  size:12,
-  theta:2.0,
-  phi:1.8
+  position:[-400,-250,-800],
+  size:18
 },
 
 {
   name:"Acrux",
   desc:"Brightest star in Crux",
   color:0xaaccff,
-  size:10,
-  theta:3.0,
-  phi:2.1
-},
-
-{
-  name:"Mimosa",
-  desc:"Blue giant in Crux",
-  color:0xaaccff,
-  size:8,
-  theta:3.1,
-  phi:2.0
+  position:[-700,-500,400],
+  size:15
 },
 
 {
   name:"Antares",
   desc:"Red supergiant in Scorpius",
-  color:0xff6644,
-  size:11,
-  theta:4.0,
-  phi:1.5
+  color:0xff5533,
+  position:[500,100,700],
+  size:17
 },
 
 {
   name:"Aldebaran",
   desc:"Orange giant in Taurus",
   color:0xffaa66,
-  size:9,
-  theta:5.0,
-  phi:1.0
+  position:[-600,400,500],
+  size:14
 },
 
 {
   name:"Naos",
   desc:"Blue supergiant in Puppis",
   color:0xaaddff,
-  size:9,
-  theta:2.7,
-  phi:2.3
+  position:[300,-450,600],
+  size:13
 }
 
 ];
 
-const starObjects = [];
+const interactiveStars = [];
 
-const starTexture =
+const texture =
   new THREE.TextureLoader().load(
     "https://threejs.org/examples/textures/sprites/disc.png"
   );
 
-stars.forEach(star=>{
-
-  const radius = 1000;
-
-  const x =
-    radius *
-    Math.sin(star.phi) *
-    Math.cos(star.theta);
-
-  const y =
-    radius *
-    Math.cos(star.phi);
-
-  const z =
-    radius *
-    Math.sin(star.phi) *
-    Math.sin(star.theta);
+constellationData.forEach(star=>{
 
   const material =
     new THREE.SpriteMaterial({
-      map:starTexture,
+      map:texture,
       color:star.color,
       transparent:true,
       blending:THREE.AdditiveBlending
@@ -334,7 +273,9 @@ stars.forEach(star=>{
   const sprite =
     new THREE.Sprite(material);
 
-  sprite.position.set(x,y,z);
+  sprite.position.set(
+    ...star.position
+  );
 
   sprite.scale.set(
     star.size,
@@ -344,18 +285,19 @@ stars.forEach(star=>{
 
   sprite.userData = {
     name:star.name,
-    desc:star.desc
+    desc:star.desc,
+    baseSize:star.size
   };
 
   scene.add(sprite);
 
-  starObjects.push(sprite);
+  interactiveStars.push(sprite);
 
 });
 
-/* ---------------------------
-RAYCASTING
----------------------------- */
+/* ------------------ */
+/* HOVER INTERACTION */
+/* ------------------ */
 
 const raycaster =
   new THREE.Raycaster();
@@ -366,24 +308,25 @@ const mouse =
 const label =
   document.getElementById("label");
 
-window.addEventListener(
-  "mousemove",
-  event=>{
+let mouseX = 0;
+let mouseY = 0;
 
-    mouse.x =
-      (event.clientX /
-      window.innerWidth)*2-1;
+window.addEventListener("mousemove",(e)=>{
 
-    mouse.y =
-      -(event.clientY /
-      window.innerHeight)*2+1;
+  mouse.x =
+    (e.clientX/window.innerWidth)*2-1;
 
-  }
-);
+  mouse.y =
+    -(e.clientY/window.innerHeight)*2+1;
 
-/* ---------------------------
-ANIMATION
----------------------------- */
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+
+});
+
+/* ------------------ */
+/* ANIMATE */
+/* ------------------ */
 
 function animate(){
 
@@ -391,7 +334,7 @@ function animate(){
 
   controls.update();
 
-  backgroundStars.rotation.y += 0.0001;
+  stars.rotation.y += 0.00015;
 
   raycaster.setFromCamera(
     mouse,
@@ -400,76 +343,74 @@ function animate(){
 
   const intersects =
     raycaster.intersectObjects(
-      starObjects
+      interactiveStars
     );
 
-  if(intersects.length>0){
+  interactiveStars.forEach(star=>{
 
-    const obj = intersects[0].object;
+    star.scale.set(
+      star.userData.baseSize,
+      star.userData.baseSize,
+      1
+    );
+
+  });
+
+  if(intersects.length > 0){
+
+    const star =
+      intersects[0].object;
+
+    star.scale.set(
+      star.userData.baseSize * 1.8,
+      star.userData.baseSize * 1.8,
+      1
+    );
 
     label.style.display = "block";
 
-    label.innerHTML =
-      "<strong>" +
-      obj.userData.name +
-      "</strong><br>" +
-      obj.userData.desc;
-
     label.style.left =
-      event.clientX + "px";
+      mouseX + 20 + "px";
 
     label.style.top =
-      event.clientY + "px";
+      mouseY - 20 + "px";
 
-    obj.scale.set(18,18,1);
+    label.innerHTML =
+      "<strong>" +
+      star.userData.name +
+      "</strong><br>" +
+      star.userData.desc;
 
   } else {
 
     label.style.display = "none";
 
-    starObjects.forEach(star=>{
-
-      const original =
-        stars.find(
-          s=>s.name===star.userData.name
-        );
-
-      star.scale.set(
-        original.size,
-        original.size,
-        1
-      );
-
-    });
-
   }
 
   renderer.render(scene,camera);
+
 }
 
 animate();
 
-/* ---------------------------
-RESIZE
----------------------------- */
+/* ------------------ */
+/* RESIZE */
+/* ------------------ */
 
-window.addEventListener(
-  "resize",
-  ()=>{
+window.addEventListener("resize",()=>{
 
-    camera.aspect =
-      window.innerWidth/
-      window.innerHeight;
+  camera.aspect =
+    window.innerWidth /
+    window.innerHeight;
 
-    camera.updateProjectionMatrix();
+  camera.updateProjectionMatrix();
 
-    renderer.setSize(
-      window.innerWidth,
-      window.innerHeight
-    );
+  renderer.setSize(
+    window.innerWidth,
+    window.innerHeight
+  );
 
-  }
-);
+});
 
 </script>
 
