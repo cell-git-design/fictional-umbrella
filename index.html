@@ -115,19 +115,24 @@ h1{
 }
 
 /* ================================
-   FLOWER ABOVE STAR
+   FLOWER POSITIONING FIX
 ================================= */
+
 .flower{
   position:absolute;
 
-  /* place flower ABOVE star */
+  /* centered above star */
   left:50%;
-  top:-58px;
+  top:-78px;
 
-  width:54px;
-  height:54px;
+  width:64px;
+  height:64px;
 
-  transform:translateX(-50%) scale(0.2);
+  transform:
+    translateX(-50%)
+    scale(0.2);
+
+  transform-origin:center bottom;
 
   opacity:0;
   pointer-events:none;
@@ -136,18 +141,23 @@ h1{
     transform 0.45s ease,
     opacity 0.35s ease;
 
-  filter:drop-shadow(0 0 10px rgba(255,255,255,0.35));
+  filter:
+    drop-shadow(0 0 12px rgba(255,255,255,0.25));
 }
 
-/* glowing stem */
+/* ================================
+   STEM
+================================= */
+
 .flower::before{
   content:'';
 
   position:absolute;
-  left:50%;
-  top:46px;
 
-  width:2px;
+  left:50%;
+  bottom:-26px;
+
+  width:3px;
   height:0px;
 
   transform:translateX(-50%);
@@ -157,122 +167,195 @@ h1{
   background:
     linear-gradient(
       to top,
-      rgba(140,255,180,0.0),
-      rgba(140,255,180,0.85),
-      rgba(220,255,240,0.95)
+      rgba(140,255,180,0.15),
+      rgba(160,255,200,0.95),
+      rgba(230,255,240,1)
     );
 
   box-shadow:
-    0 0 8px rgba(140,255,180,0.55);
+    0 0 10px rgba(160,255,200,0.55);
 
-  transition:height 0.45s ease;
+  transition:
+    height 0.45s ease;
 }
 
-/* flower center */
+/* ================================
+   FLOWER CENTER / BUD
+================================= */
+
 .flower::after{
   content:'';
 
   position:absolute;
+
   left:50%;
   top:50%;
 
   width:14px;
   height:14px;
 
-  transform:translate(-50%, -50%);
+  transform:
+    translate(-50%, -50%);
 
   border-radius:50%;
 
   background:
     radial-gradient(circle,
       rgba(255,255,255,1) 0%,
-      rgba(255,240,180,0.95) 35%,
-      rgba(255,210,120,0.55) 70%,
-      rgba(255,210,120,0.0) 100%);
+      rgba(255,245,170,0.95) 30%,
+      rgba(255,210,100,0.65) 70%,
+      rgba(255,210,100,0.0) 100%);
 
   box-shadow:
-    0 0 10px rgba(255,220,140,0.7),
-    0 0 22px rgba(255,160,220,0.35);
+    0 0 12px rgba(255,220,120,0.8),
+    0 0 28px rgba(255,180,140,0.35);
+
+  z-index:3;
 }
 
-/* petals */
+/* ================================
+   PETALS
+================================= */
+
 .flower span{
   position:absolute;
 
   left:50%;
   top:50%;
 
-  width:12px;
-  height:22px;
+  width:13px;
+  height:26px;
 
-  margin-left:-6px;
-  margin-top:-20px;
+  margin-left:-6.5px;
+  margin-top:-13px;
 
-  border-radius:999px 999px 60% 60%;
+  border-radius:
+    999px
+    999px
+    70%
+    70%;
 
   background:
-    radial-gradient(circle at 50% 35%,
+    radial-gradient(circle at 50% 30%,
       rgba(255,255,255,0.98) 0%,
-      rgba(255,200,235,0.92) 30%,
-      rgba(255,140,205,0.55) 70%,
+      rgba(255,210,235,0.92) 30%,
+      rgba(255,140,205,0.72) 70%,
       rgba(255,140,205,0.0) 100%);
 
-  transform-origin:50% 18px;
+  transform-origin:
+    center
+    28px;
 
-  opacity:0.95;
-
-  animation:none;
+  opacity:0;
 }
 
-/* petal positions */
+/* evenly distribute petals */
 .flower span:nth-child(1){
-  transform:translate(-50%, -50%) rotate(0deg) translateY(-16px) scale(0.6);
-}
-.flower span:nth-child(2){
-  transform:translate(-50%, -50%) rotate(60deg) translateY(-16px) scale(0.6);
-}
-.flower span:nth-child(3){
-  transform:translate(-50%, -50%) rotate(120deg) translateY(-16px) scale(0.6);
-}
-.flower span:nth-child(4){
-  transform:translate(-50%, -50%) rotate(180deg) translateY(-16px) scale(0.6);
-}
-.flower span:nth-child(5){
-  transform:translate(-50%, -50%) rotate(240deg) translateY(-16px) scale(0.6);
-}
-.flower span:nth-child(6){
-  transform:translate(-50%, -50%) rotate(300deg) translateY(-16px) scale(0.6);
+  transform:
+    translate(-50%, -50%)
+    rotate(0deg)
+    translateY(-20px)
+    scale(0.2);
 }
 
-/* hover reveal */
+.flower span:nth-child(2){
+  transform:
+    translate(-50%, -50%)
+    rotate(60deg)
+    translateY(-20px)
+    scale(0.2);
+}
+
+.flower span:nth-child(3){
+  transform:
+    translate(-50%, -50%)
+    rotate(120deg)
+    translateY(-20px)
+    scale(0.2);
+}
+
+.flower span:nth-child(4){
+  transform:
+    translate(-50%, -50%)
+    rotate(180deg)
+    translateY(-20px)
+    scale(0.2);
+}
+
+.flower span:nth-child(5){
+  transform:
+    translate(-50%, -50%)
+    rotate(240deg)
+    translateY(-20px)
+    scale(0.2);
+}
+
+.flower span:nth-child(6){
+  transform:
+    translate(-50%, -50%)
+    rotate(300deg)
+    translateY(-20px)
+    scale(0.2);
+}
+
+/* ================================
+   HOVER STATE
+================================= */
+
 .star-group:hover .flower{
   opacity:1;
 
   transform:
     translateX(-50%)
-    scale(1.05);
+    scale(1);
 
   animation:
-    flowerFloat 1.6s ease-in-out infinite;
+    flowerFloat 1.8s ease-in-out infinite;
 }
 
-/* grow stem upward */
+/* grow stem from star upward */
 .star-group:hover .flower::before{
-  height:52px;
+  height:48px;
 }
 
 /* bloom petals */
 .star-group:hover .flower span{
-  animation:bloom 0.55s ease forwards;
+  animation:
+    petalBloom 0.55s ease forwards;
 }
 
 .star-group:hover .flower span:nth-child(1){ animation-delay:0.00s; }
-.star-group:hover .flower span:nth-child(2){ animation-delay:0.04s; }
-.star-group:hover .flower span:nth-child(3){ animation-delay:0.08s; }
-.star-group:hover .flower span:nth-child(4){ animation-delay:0.12s; }
-.star-group:hover .flower span:nth-child(5){ animation-delay:0.16s; }
-.star-group:hover .flower span:nth-child(6){ animation-delay:0.20s; }
+.star-group:hover .flower span:nth-child(2){ animation-delay:0.05s; }
+.star-group:hover .flower span:nth-child(3){ animation-delay:0.10s; }
+.star-group:hover .flower span:nth-child(4){ animation-delay:0.15s; }
+.star-group:hover .flower span:nth-child(5){ animation-delay:0.20s; }
+.star-group:hover .flower span:nth-child(6){ animation-delay:0.25s; }
 
+/* ================================
+   PETAL BLOOM ANIMATION
+================================= */
+
+@keyframes petalBloom{
+  0%{
+    opacity:0;
+
+    transform:
+      translate(-50%, -50%)
+      rotate(var(--rot))
+      translateY(-8px)
+      scale(0.1);
+  }
+
+  100%{
+    opacity:1;
+
+    transform:
+      translate(-50%, -50%)
+      rotate(var(--rot))
+      translateY(-20px)
+      scale(1);
+  }
+}
 /* ================================
    STAR CORE (APPLE-STYLE GLOW)
 ================================= */
