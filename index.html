@@ -26,112 +26,267 @@ body{
   color:white;
 }
 
+/* TITLE */
+
 h1{
   position:absolute;
   top:20px;
   width:100%;
   text-align:center;
-  font-size:2.5rem;
-  letter-spacing:4px;
-  font-weight:300;
   z-index:1000;
-  text-shadow:0 0 25px rgba(120,160,255,0.6);
+  font-size:2.7rem;
+  letter-spacing:5px;
+  font-weight:300;
+  color:rgba(255,255,255,0.95);
+
+  text-shadow:
+    0 0 10px rgba(255,255,255,0.7),
+    0 0 30px rgba(120,160,255,0.5);
 }
+
+/* SKY */
 
 .sky{
   position:relative;
   width:100vw;
   height:100vh;
-  perspective:1200px;
   transform-style:preserve-3d;
+  transition:transform 0.12s linear;
+  perspective:1200px;
 }
 
-/* STARS */
+/* BACKGROUND STARS */
+
+.background-star{
+  position:absolute;
+  border-radius:50%;
+  background:white;
+  opacity:0.7;
+  animation:twinkle linear infinite;
+}
+
+/* STAR GROUP */
 
 .star-group{
   position:absolute;
+  transform-style:preserve-3d;
   transform:translate(-50%, -50%);
   text-align:center;
   transition:transform 0.2s ease;
-  animation:drift 8s ease-in-out infinite alternate;
+  animation:drift ease-in-out infinite alternate;
 }
 
+/* MAIN STAR */
+
 .star{
+  margin:auto;
+  border-radius:50%;
+
+  background:
+    radial-gradient(circle,
+    rgba(255,255,255,1) 0%,
+    rgba(255,255,255,0.95) 20%,
+    rgba(255,255,255,0.25) 60%,
+    rgba(255,255,255,0) 100%);
+
+  animation:twinkle 4s ease-in-out infinite;
+
+  transition:all 0.35s ease;
+}
+
+/* STAR SIZES */
+
+.small{
+  width:6px;
+  height:6px;
+}
+
+.medium{
   width:10px;
   height:10px;
-  border-radius:50%;
-  background:white;
-  box-shadow:0 0 12px white;
-  margin:auto;
-  transition:all 0.3s ease;
+}
+
+.large{
+  width:16px;
+  height:16px;
+}
+
+/* LABELS */
+
+.label{
+  margin-top:14px;
+
+  opacity:0;
+
+  font-size:0.82rem;
+  line-height:1.5;
+
+  width:220px;
+
+  color:rgba(255,255,255,0.75);
+
+  transform:
+    translateY(10px)
+    scale(0.95);
+
+  transition:all 0.35s ease;
+
+  pointer-events:none;
+
+  text-shadow:
+    0 0 10px rgba(255,255,255,0.15);
+}
+
+/* HOVER EFFECTS */
+
+.star-group:hover{
+  z-index:999;
 }
 
 .star-group:hover .star{
-  transform:scale(2.6);
-  box-shadow:0 0 25px white, 0 0 60px rgba(120,160,255,0.8);
-}
 
-/* STAR LABEL (DESCRIPTION) */
+  transform:scale(2.8);
 
-.label{
-  margin-top:10px;
-  width:220px;
-  font-size:0.8rem;
-  opacity:0;
-  transform:translateY(10px);
-  transition:all 0.35s ease;
-  pointer-events:none;
-  color:rgba(255,255,255,0.7);
+  box-shadow:
+    0 0 15px white,
+    0 0 35px rgba(255,255,255,0.9),
+    0 0 80px rgba(100,150,255,0.9);
+
 }
 
 .star-group:hover .label{
+
   opacity:1;
-  transform:translateY(-5px);
+
+  transform:
+    translateY(-4px)
+    scale(1);
+
   color:white;
+
+  text-shadow:
+    0 0 10px white,
+    0 0 22px rgba(100,150,255,0.8);
+
 }
 
-/* CONSTELLATION NAME POPUP */
+/* INFO PANEL */
 
-.constellation-label{
+.info-panel{
+
   position:absolute;
-  padding:10px 14px;
-  border-radius:12px;
-  background:rgba(0,0,0,0.6);
-  border:1px solid rgba(255,255,255,0.15);
-  backdrop-filter:blur(8px);
-  font-size:1rem;
-  opacity:0;
-  transform:translateY(-10px);
-  transition:all 0.3s ease;
-  pointer-events:none;
-  z-index:2000;
+
+  right:30px;
+  bottom:30px;
+
+  width:340px;
+
+  padding:22px;
+
+  border-radius:20px;
+
+  background:
+    rgba(255,255,255,0.06);
+
+  backdrop-filter:blur(10px);
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  color:
+    rgba(255,255,255,0.88);
+
+  z-index:1000;
+
+  box-shadow:
+    0 0 30px rgba(0,0,0,0.45);
 }
 
-/* SVG LINES */
+.info-panel h2{
+  margin-bottom:12px;
+  font-weight:400;
+  letter-spacing:1px;
+}
 
-svg{
+/* SHOOTING STAR */
+
+.shooting-star{
+
   position:absolute;
-  width:100%;
-  height:100%;
-  pointer-events:none;
-}
 
-path{
-  fill:none;
-  stroke:rgba(180,220,255,0.85);
-  stroke-width:2;
-  filter:drop-shadow(0 0 6px rgba(120,160,255,0.8));
-  stroke-dasharray:600;
-  stroke-dashoffset:600;
-  transition:stroke-dashoffset 0.8s ease, opacity 0.5s ease;
+  width:180px;
+  height:2px;
+
+  background:
+    linear-gradient(to right,
+    white,
+    transparent);
+
   opacity:0;
+
+  transform:rotate(-25deg);
+
+  animation:shooting 11s linear infinite;
 }
 
-/* BACKGROUND DRIFT */
+/* ANIMATIONS */
+
+@keyframes twinkle{
+
+  0%{ opacity:0.45; }
+
+  50%{ opacity:1; }
+
+  100%{ opacity:0.45; }
+}
+
+@keyframes shooting{
+
+  0%{
+    top:-10%;
+    left:-20%;
+    opacity:0;
+  }
+
+  5%{
+    opacity:1;
+  }
+
+  15%{
+    top:40%;
+    left:120%;
+    opacity:0;
+  }
+
+  100%{
+    opacity:0;
+  }
+}
+
+/* SUBTLE SPACE DRIFT */
 
 @keyframes drift{
-  0%{ transform:translate(-50%,-50%) translate(0px,0px); }
-  100%{ transform:translate(-50%,-50%) translate(2px,3px); }
+
+  0%{
+    transform:
+      translate(-50%, -50%)
+      translateX(-3px)
+      translateY(-2px);
+  }
+
+  50%{
+    transform:
+      translate(-50%, -50%)
+      translateX(2px)
+      translateY(3px);
+  }
+
+  100%{
+    transform:
+      translate(-50%, -50%)
+      translateX(-2px)
+      translateY(1px);
+  }
 }
 
 </style>
@@ -143,161 +298,148 @@ path{
 
 <div class="sky" id="sky">
 
-<svg id="lines"></svg>
+  <div class="shooting-star"></div>
 
-<div id="constellationLabel" class="constellation-label"></div>
+  <!-- PUPPIS -->
 
-<!-- PUPPIS -->
-<div class="star-group" data-constellation="Puppis" data-order="1" style="left:18%; top:58%;">
-  <div class="star"></div>
-  <div class="label"><b>Naos</b><br>Blue supergiant ~1,000 ly away</div>
+  <div class="star-group" style="left:18%; top:58%; animation-duration:9s;">
+    <div class="star large"></div>
+
+    <div class="label">
+      <strong>Naos</strong><br>
+      A luminous blue supergiant approximately
+      1,090 light-years from Earth. One of the
+      brightest stars in Puppis and over
+      700,000 times more luminous than the Sun.
+    </div>
+  </div>
+
+  <div class="star-group" style="left:28%; top:48%; animation-duration:11s;">
+    <div class="star medium"></div>
+
+    <div class="label">
+      <strong>Suhail</strong><br>
+      Historically used by navigators across
+      the southern oceans. Its Arabic name
+      refers to brightness and smoothness in
+      the night sky.
+    </div>
+  </div>
+
+  <div class="star-group" style="left:38%; top:62%; animation-duration:10s;">
+    <div class="star medium"></div>
+
+    <div class="label">
+      <strong>Tureis</strong><br>
+      A giant yellow-white star in Puppis,
+      visible to the naked eye from the
+      southern hemisphere during summer months.
+    </div>
+  </div>
+
+  <!-- ORION -->
+
+  <div class="star-group" style="left:65%; top:24%; animation-duration:12s;">
+    <div class="star large"></div>
+
+    <div class="label">
+      <strong>Betelgeuse</strong><br>
+      A massive red supergiant nearing the end
+      of its life cycle. If placed at the center
+      of our Solar System, it would extend
+      beyond Jupiter’s orbit.
+    </div>
+  </div>
+
+  <div class="star-group" style="left:75%; top:46%; animation-duration:8s;">
+    <div class="star large"></div>
+
+    <div class="label">
+      <strong>Rigel</strong><br>
+      A brilliant blue-white supergiant roughly
+      860 light-years away. It radiates tens of
+      thousands of times more energy than the Sun.
+    </div>
+  </div>
+
+  <div class="star-group" style="left:70%; top:35%; animation-duration:9.5s;">
+    <div class="star medium"></div>
+
+    <div class="label">
+      <strong>Alnilam</strong><br>
+      The central star in Orion’s Belt.
+      Extremely luminous and visible across
+      vast interstellar distances.
+    </div>
+  </div>
+
+  <!-- CRUX -->
+
+  <div class="star-group" style="left:86%; top:75%; animation-duration:13s;">
+    <div class="star large"></div>
+
+    <div class="label">
+      <strong>Acrux</strong><br>
+      The brightest star in the Southern Cross.
+      Actually a multiple star system composed
+      of intensely hot blue stars.
+    </div>
+  </div>
+
+  <div class="star-group" style="left:82%; top:66%; animation-duration:11s;">
+    <div class="star medium"></div>
+
+    <div class="label">
+      <strong>Mimosa</strong><br>
+      A hot blue giant star with rapid rotation
+      and strong ultraviolet radiation emissions.
+    </div>
+  </div>
+
+  <!-- CANIS MAJOR -->
+
+  <div class="star-group" style="left:54%; top:72%; animation-duration:10s;">
+    <div class="star large"></div>
+
+    <div class="label">
+      <strong>Sirius</strong><br>
+      The brightest star visible in Earth’s
+      night sky. Located only 8.6 light-years
+      away and part of a binary star system.
+    </div>
+  </div>
+
+  <div class="star-group" style="left:61%; top:65%; animation-duration:12s;">
+    <div class="star medium"></div>
+
+    <div class="label">
+      <strong>Adhara</strong><br>
+      An enormous blue-white giant star once
+      considered among the brightest stars
+      visible from Earth thousands of years ago.
+    </div>
+  </div>
+
 </div>
 
-<div class="star-group" data-constellation="Puppis" data-order="2" style="left:28%; top:48%;">
-  <div class="star"></div>
-  <div class="label"><b>Suhail</b><br>Ancient navigation star of the south seas</div>
-</div>
+<!-- INFO PANEL -->
 
-<div class="star-group" data-constellation="Puppis" data-order="3" style="left:38%; top:62%;">
-  <div class="star"></div>
-  <div class="label"><b>Tureis</b><br>Yellow-white giant star</div>
-</div>
+<div class="info-panel">
 
-<!-- ORION -->
-<div class="star-group" data-constellation="Orion" data-order="1" style="left:65%; top:24%;">
-  <div class="star"></div>
-  <div class="label"><b>Betelgeuse</b><br>Red supergiant nearing supernova stage</div>
-</div>
+  <h2>Interactive Sky</h2>
 
-<div class="star-group" data-constellation="Orion" data-order="2" style="left:70%; top:35%;">
-  <div class="star"></div>
-  <div class="label"><b>Alnilam</b><br>Central Belt star of Orion</div>
-</div>
-
-<div class="star-group" data-constellation="Orion" data-order="3" style="left:75%; top:46%;">
-  <div class="star"></div>
-  <div class="label"><b>Rigel</b><br>Blue supergiant, extremely luminous</div>
-</div>
-
-<!-- CRUX -->
-<div class="star-group" data-constellation="Crux" data-order="1" style="left:82%; top:66%;">
-  <div class="star"></div>
-  <div class="label"><b>Mimosa</b><br>Hot blue giant star</div>
-</div>
-
-<div class="star-group" data-constellation="Crux" data-order="2" style="left:86%; top:75%;">
-  <div class="star"></div>
-  <div class="label"><b>Acrux</b><br>Brightest star in the Southern Cross</div>
-</div>
-
-<div class="star-group" data-constellation="Crux" data-order="3" style="left:90%; top:66%;">
-  <div class="star"></div>
-  <div class="label"><b>Gacrux</b><br>Red giant marking the top of the Cross</div>
-</div>
+  <p>
+    Move your mouse to tilt the sky gently in 3D.
+    Hover over stars to reveal detailed
+    astronomical descriptions.
+    Stars subtly drift and shimmer to create
+    a living celestial atmosphere.
+  </p>
 
 </div>
 
 <script>
 
-const sky = document.getElementById("sky");
-const svg = document.getElementById("lines");
-const label = document.getElementById("constellationLabel");
-
-let activePaths = [];
-
-/* CREATE CONSTELLATION PATH */
-
-function drawConstellation(name, stars){
-
-  const sorted =
-    [...stars].sort((a,b)=>
-      a.dataset.order - b.dataset.order
-    );
-
-  const points =
-    sorted.map(s=>{
-      const rect = s.getBoundingClientRect();
-      return {
-        x: rect.left + rect.width/2,
-        y: rect.top + rect.height/2
-      };
-    });
-
-  let d = `M ${points[0].x} ${points[0].y}`;
-
-  for(let i=1;i<points.length;i++){
-    d += ` L ${points[i].x} ${points[i].y}`;
-  }
-
-  const path = document.createElementNS(
-    "http://www.w3.org/2000/svg",
-    "path"
-  );
-
-  path.setAttribute("d", d);
-
-  svg.appendChild(path);
-
-  requestAnimationFrame(()=>{
-
-    path.style.opacity = 1;
-    path.style.strokeDashoffset = 0;
-
-  });
-
-  activePaths.push(path);
-}
-
-/* CLEAR PATHS */
-
-function clearPaths(){
-
-  activePaths.forEach(p=>{
-    p.style.opacity = 0;
-    setTimeout(()=>p.remove(), 500);
-  });
-
-  activePaths = [];
-}
-
-/* HOVER LOGIC */
-
-const groups = document.querySelectorAll(".star-group");
-
-groups.forEach(group=>{
-
-  group.addEventListener("mouseenter", ()=>{
-
-    clearPaths();
-
-    const constellation =
-      group.dataset.constellation;
-
-    const stars =
-      [...document.querySelectorAll(
-        `.star-group[data-constellation="${constellation}"]`
-      )];
-
-    drawConstellation(constellation, stars);
-
-    label.style.opacity = 1;
-    label.innerHTML = constellation;
-
-    const rect = group.getBoundingClientRect();
-
-    label.style.left = rect.left + "px";
-    label.style.top = rect.top - 30 + "px";
-
-  });
-
-  group.addEventListener("mouseleave", ()=>{
-
-    clearPaths();
-    label.style.opacity = 0;
-
-  });
-
-});
 /* BACKGROUND STARS */
 
 const sky = document.getElementById("sky");
@@ -328,6 +470,25 @@ for(let i = 0; i < 240; i++){
     (2 + Math.random() * 5) + "s";
 
   sky.appendChild(star);
+}
+/* SVG LINES */
+
+svg{
+  position:absolute;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+}
+
+path{
+  fill:none;
+  stroke:rgba(180,220,255,0.85);
+  stroke-width:2;
+  filter:drop-shadow(0 0 6px rgba(120,160,255,0.8));
+  stroke-dasharray:600;
+  stroke-dashoffset:600;
+  transition:stroke-dashoffset 0.8s ease, opacity 0.5s ease;
+  opacity:0;
 }
 
 /* 3D PARALLAX */
