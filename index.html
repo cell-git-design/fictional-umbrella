@@ -4,40 +4,59 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<title>Southern Night Sky</title>
+<title>Interactive Southern Sky</title>
 
 <style>
 
-/* RESET */
+/* ================================
+   APPLE SYSTEM TYPOGRAPHY RESET
+================================= */
 *{
   margin:0;
   padding:0;
   box-sizing:border-box;
+
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Text",
+    "SF Pro Display",
+    "Helvetica Neue",
+    Helvetica,
+    Arial,
+    sans-serif;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
+/* ================================
+   BODY (SOFT APPLE SPACE AESTHETIC)
+================================= */
 body{
   overflow:hidden;
   height:100vh;
-  font-family:-apple-system, BlinkMacSystemFont, "SF Pro Display", Arial, sans-serif;
   color:white;
 
-  /* Apple-style deep layered space */
   background:
-    radial-gradient(circle at 30% 20%, rgba(80,120,255,0.10), transparent 55%),
-    radial-gradient(circle at 70% 70%, rgba(180,80,255,0.08), transparent 60%),
+    radial-gradient(circle at 30% 20%, rgba(120,160,255,0.10), transparent 55%),
+    radial-gradient(circle at 70% 80%, rgba(180,90,255,0.08), transparent 60%),
     radial-gradient(circle at bottom, #0b1020 0%, #05060c 45%, #000000 100%);
 }
 
-/* TITLE (clean, minimal, Apple-like) */
+/* ================================
+   TITLE (SF PRO DISPLAY STYLE)
+================================= */
 h1{
   position:absolute;
   top:22px;
   width:100%;
   text-align:center;
-  font-weight:300;
-  font-size:2.4rem;
-  letter-spacing:6px;
   z-index:1000;
+
+  font-weight:300;
+  font-size:2.5rem;
+  letter-spacing:6px;
 
   color:rgba(255,255,255,0.92);
 
@@ -45,13 +64,16 @@ h1{
     0 0 20px rgba(120,180,255,0.35);
 }
 
-/* SKY */
+/* ================================
+   SKY CONTAINER
+================================= */
 .sky{
   position:relative;
   width:100vw;
   height:100vh;
-  perspective:1200px;
   transform-style:preserve-3d;
+  transition:transform 0.12s linear;
+  perspective:1200px;
 }
 
 /* subtle nebula haze layer */
@@ -62,40 +84,47 @@ h1{
   height:200%;
   top:-50%;
   left:-50%;
+
   background:
     radial-gradient(circle at 40% 40%, rgba(120,160,255,0.08), transparent 60%),
     radial-gradient(circle at 60% 70%, rgba(200,120,255,0.05), transparent 65%);
+
   pointer-events:none;
 }
 
-/* BACKGROUND STARS */
+/* ================================
+   BACKGROUND STARS
+================================= */
 .background-star{
   position:absolute;
   border-radius:50%;
   background:white;
   opacity:0.6;
   animation:twinkle linear infinite;
-  filter: blur(0.2px);
 }
 
-/* STAR GROUP */
+/* ================================
+   STAR GROUP
+================================= */
 .star-group{
   position:absolute;
+  transform-style:preserve-3d;
   transform:translate(-50%, -50%);
   text-align:center;
-  animation:drift 10s ease-in-out infinite alternate;
+  animation:drift ease-in-out infinite alternate;
 }
 
-/* STAR CORE (more Apple glow, less harsh) */
+/* ================================
+   STAR CORE (APPLE-STYLE GLOW)
+================================= */
 .star{
-  width:10px;
-  height:10px;
+  margin:auto;
   border-radius:50%;
 
   background:
     radial-gradient(circle,
       rgba(255,255,255,1) 0%,
-      rgba(200,220,255,0.8) 25%,
+      rgba(200,220,255,0.85) 25%,
       rgba(150,180,255,0.25) 60%,
       rgba(0,0,0,0) 100%);
 
@@ -105,34 +134,42 @@ h1{
   transition:transform 0.35s ease, box-shadow 0.35s ease;
 }
 
-/* HOVER STAR GLOW (Apple-style bloom) */
+/* star sizes */
+.small{ width:6px; height:6px; }
+.medium{ width:10px; height:10px; }
+.large{ width:16px; height:16px; }
+
+/* hover glow */
 .star-group:hover .star{
-  transform:scale(2.6);
+  transform:scale(2.7);
 
   box-shadow:
-    0 0 18px rgba(255,255,255,0.9),
+    0 0 18px rgba(255,255,255,0.95),
     0 0 45px rgba(120,180,255,0.6),
-    0 0 90px rgba(150,120,255,0.25);
+    0 0 90px rgba(160,120,255,0.25);
 }
 
-/* LABEL (frosted glass tooltip) */
+/* ================================
+   LABEL (FROSTED APPLE TOOLTIP)
+================================= */
 .label{
-  margin-top:12px;
+  margin-top:14px;
   width:240px;
 
   padding:10px 12px;
   border-radius:14px;
 
   font-size:0.82rem;
-  line-height:1.45;
+  line-height:1.5;
+
+  font-weight:400;
+  letter-spacing:0.2px;
 
   color:rgba(255,255,255,0.72);
 
   opacity:0;
 
-  transform:
-    translateY(10px)
-    scale(0.96);
+  transform:translateY(10px) scale(0.96);
 
   transition:all 0.4s ease;
 
@@ -141,20 +178,21 @@ h1{
   background:rgba(255,255,255,0.06);
   border:1px solid rgba(255,255,255,0.10);
 
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(12px);
 
-  box-shadow:
-    0 10px 30px rgba(0,0,0,0.35);
+  box-shadow:0 10px 30px rgba(0,0,0,0.35);
 }
 
-/* LABEL HOVER STATE */
+/* label hover */
 .star-group:hover .label{
   opacity:1;
   transform:translateY(-6px) scale(1);
   color:rgba(255,255,255,0.95);
 }
 
-/* INFO PANEL (already Apple-like, now refined) */
+/* ================================
+   INFO PANEL (MACOS GLASS CARD)
+================================= */
 .info-panel{
   position:absolute;
   right:30px;
@@ -169,33 +207,64 @@ h1{
 
   backdrop-filter: blur(14px);
 
-  box-shadow:
-    0 20px 60px rgba(0,0,0,0.45);
+  box-shadow:0 20px 60px rgba(0,0,0,0.45);
 
   color:rgba(255,255,255,0.88);
 
-  transform: translateY(20px);
-  opacity:0;
-
   animation:panelIn 1s ease forwards 0.3s;
+  transform:translateY(20px);
+  opacity:0;
 }
 
 .info-panel h2{
-  font-weight:400;
+  font-weight:300;
+  font-size:1.25rem;
+  letter-spacing:0.5px;
   margin-bottom:10px;
-  letter-spacing:1px;
 }
 
-/* ANIMATIONS */
+.info-panel p{
+  font-size:0.9rem;
+  line-height:1.55;
+  color:rgba(255,255,255,0.85);
+}
+
+/* ================================
+   SHOOTING STAR
+================================= */
+.shooting-star{
+  position:absolute;
+  width:180px;
+  height:2px;
+
+  background:linear-gradient(to right, white, transparent);
+
+  opacity:0;
+  transform:rotate(-25deg);
+
+  animation:shooting 11s linear infinite;
+}
+
+/* ================================
+   ANIMATIONS
+================================= */
 @keyframes twinkle{
-  0%{ opacity:0.35; }
+  0%{ opacity:0.45; }
   50%{ opacity:1; }
-  100%{ opacity:0.35; }
+  100%{ opacity:0.45; }
+}
+
+@keyframes shooting{
+  0%{ top:-10%; left:-20%; opacity:0; }
+  5%{ opacity:1; }
+  15%{ top:40%; left:120%; opacity:0; }
+  100%{ opacity:0; }
 }
 
 @keyframes drift{
-  0%{ transform:translate(-50%,-50%) translate(0px,0px); }
-  100%{ transform:translate(-50%,-50%) translate(3px,2px); }
+  0%{ transform:translate(-50%, -50%) translate(-3px,-2px); }
+  50%{ transform:translate(-50%, -50%) translate(2px,3px); }
+  100%{ transform:translate(-50%, -50%) translate(-2px,1px); }
 }
 
 @keyframes panelIn{
@@ -214,128 +283,83 @@ h1{
 
 <div class="sky" id="sky">
 
-<!-- PUPPIS -->
-<div class="star-group" style="left:18%; top:58%;">
-  <div class="star"></div>
-  <div class="label">
-    <b>Naos</b><br>
-    Blue supergiant ~1,000 light-years away.
-    One of the most luminous known stars in Puppis.
+  <div class="shooting-star"></div>
+
+  <!-- PUPPIS -->
+  <div class="star-group" style="left:18%; top:58%;">
+    <div class="star large"></div>
+    <div class="label"><b>Naos</b><br>Blue supergiant ~1,000 light-years away.</div>
   </div>
-</div>
 
-<div class="star-group" style="left:28%; top:48%;">
-  <div class="star"></div>
-  <div class="label">
-    <b>Suhail</b><br>
-    Ancient southern navigation star used by Arabian and maritime explorers.
+  <div class="star-group" style="left:28%; top:48%;">
+    <div class="star medium"></div>
+    <div class="label"><b>Suhail</b><br>Ancient southern navigation star.</div>
   </div>
-</div>
 
-<div class="star-group" style="left:38%; top:62%;">
-  <div class="star"></div>
-  <div class="label">
-    <b>Tureis</b><br>
-    Yellow-white giant star visible in southern skies during summer.
+  <div class="star-group" style="left:38%; top:62%;">
+    <div class="star medium"></div>
+    <div class="label"><b>Tureis</b><br>Yellow-white giant in Puppis.</div>
   </div>
-</div>
 
-<!-- ORION -->
-<div class="star-group" style="left:65%; top:24%;">
-  <div class="star"></div>
-  <div class="label">
-    <b>Betelgeuse</b><br>
-    Red supergiant nearing the end of its life.
-    Would engulf inner planets if placed in our Solar System.
+  <!-- ORION -->
+  <div class="star-group" style="left:65%; top:24%;">
+    <div class="star large"></div>
+    <div class="label"><b>Betelgeuse</b><br>Red supergiant nearing supernova.</div>
   </div>
-</div>
 
-<div class="star-group" style="left:75%; top:46%;">
-  <div class="star"></div>
-  <div class="label">
-    <b>Rigel</b><br>
-    Extremely luminous blue supergiant ~860 light-years away.
+  <div class="star-group" style="left:70%; top:35%;">
+    <div class="star medium"></div>
+    <div class="label"><b>Alnilam</b><br>Central belt star of Orion.</div>
   </div>
-</div>
 
-<div class="star-group" style="left:70%; top:35%;">
-  <div class="star"></div>
-  <div class="label">
-    <b>Alnilam</b><br>
-    Central belt star of Orion, far more massive than the Sun.
+  <div class="star-group" style="left:75%; top:46%;">
+    <div class="star large"></div>
+    <div class="label"><b>Rigel</b><br>Blue supergiant ~860 light-years away.</div>
   </div>
-</div>
 
-<!-- CRUX -->
-<div class="star-group" style="left:86%; top:75%;">
-  <div class="star"></div>
-  <div class="label">
-    <b>Acrux</b><br>
-    Brightest star in the Southern Cross system.
-    Actually a multi-star system of hot blue stars.
+  <!-- CRUX -->
+  <div class="star-group" style="left:82%; top:66%;">
+    <div class="star medium"></div>
+    <div class="label"><b>Mimosa</b><br>Hot blue giant star.</div>
   </div>
-</div>
 
-<div class="star-group" style="left:82%; top:66%;">
-  <div class="star"></div>
-  <div class="label">
-    <b>Mimosa</b><br>
-    Hot blue giant with intense ultraviolet output.
+  <div class="star-group" style="left:86%; top:75%;">
+    <div class="star large"></div>
+    <div class="label"><b>Acrux</b><br>Brightest star in Southern Cross.</div>
   </div>
-</div>
 
-<!-- CANIS MAJOR -->
-<div class="star-group" style="left:54%; top:72%;">
-  <div class="star"></div>
-  <div class="label">
-    <b>Sirius</b><br>
-    Brightest star in the night sky.
-    A binary system just 8.6 light-years away.
+  <!-- CANIS MAJOR -->
+  <div class="star-group" style="left:54%; top:72%;">
+    <div class="star large"></div>
+    <div class="label"><b>Sirius</b><br>Brightest star in the night sky.</div>
   </div>
-</div>
-
-<div class="star-group" style="left:61%; top:65%;">
-  <div class="star"></div>
-  <div class="label">
-    <b>Adhara</b><br>
-    Massive blue-white star once among the brightest in Earth’s sky.
-  </div>
-</div>
 
 </div>
 
-<!-- INFO PANEL -->
 <div class="info-panel">
   <h2>Interactive Sky</h2>
   <p>
-    A soft immersive sky rendered in a glass-like aesthetic.
-    Hover stars to reveal astrophysical detail.
-    Designed with a modern Apple-style visual language:
-    depth, blur, glow, and minimal contrast.
+    A minimal Apple-style celestial interface.
+    Hover stars for detailed astronomical context.
+    Designed with glassmorphism, soft glow, and spatial depth.
   </p>
 </div>
 
 <script>
 
-/* BACKGROUND STARS */
+/* background stars */
 const sky = document.getElementById("sky");
 
-for(let i = 0; i < 260; i++){
-
-  const star = document.createElement("div");
-  star.classList.add("background-star");
-
-  const size = Math.random() * 2.5;
-
-  star.style.width = size + "px";
-  star.style.height = size + "px";
-
-  star.style.left = Math.random() * 100 + "%";
-  star.style.top = Math.random() * 100 + "%";
-
-  star.style.animationDuration = (2 + Math.random() * 6) + "s";
-
-  sky.appendChild(star);
+for(let i=0;i<260;i++){
+  const s=document.createElement("div");
+  s.className="background-star";
+  const size=Math.random()*2.5;
+  s.style.width=size+"px";
+  s.style.height=size+"px";
+  s.style.left=Math.random()*100+"%";
+  s.style.top=Math.random()*100+"%";
+  s.style.animationDuration=(2+Math.random()*6)+"s";
+  sky.appendChild(s);
 }
 
 </script>
