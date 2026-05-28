@@ -4,10 +4,11 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<title>Interactive Southern Sky</title>
+<title>Southern Night Sky</title>
 
 <style>
 
+/* RESET */
 *{
   margin:0;
   padding:0;
@@ -16,276 +17,191 @@
 
 body{
   overflow:hidden;
-  background:
-    radial-gradient(circle at bottom,
-    #16213d 0%,
-    #090b14 45%,
-    #020305 100%);
-  font-family:Arial, sans-serif;
   height:100vh;
+  font-family:-apple-system, BlinkMacSystemFont, "SF Pro Display", Arial, sans-serif;
   color:white;
+
+  /* Apple-style deep layered space */
+  background:
+    radial-gradient(circle at 30% 20%, rgba(80,120,255,0.10), transparent 55%),
+    radial-gradient(circle at 70% 70%, rgba(180,80,255,0.08), transparent 60%),
+    radial-gradient(circle at bottom, #0b1020 0%, #05060c 45%, #000000 100%);
 }
 
-/* TITLE */
-
+/* TITLE (clean, minimal, Apple-like) */
 h1{
   position:absolute;
-  top:20px;
+  top:22px;
   width:100%;
   text-align:center;
-  z-index:1000;
-  font-size:2.7rem;
-  letter-spacing:5px;
   font-weight:300;
-  color:rgba(255,255,255,0.95);
+  font-size:2.4rem;
+  letter-spacing:6px;
+  z-index:1000;
+
+  color:rgba(255,255,255,0.92);
 
   text-shadow:
-    0 0 10px rgba(255,255,255,0.7),
-    0 0 30px rgba(120,160,255,0.5);
+    0 0 20px rgba(120,180,255,0.35);
 }
 
 /* SKY */
-
 .sky{
   position:relative;
   width:100vw;
   height:100vh;
-  transform-style:preserve-3d;
-  transition:transform 0.12s linear;
   perspective:1200px;
+  transform-style:preserve-3d;
+}
+
+/* subtle nebula haze layer */
+.sky::before{
+  content:'';
+  position:absolute;
+  width:200%;
+  height:200%;
+  top:-50%;
+  left:-50%;
+  background:
+    radial-gradient(circle at 40% 40%, rgba(120,160,255,0.08), transparent 60%),
+    radial-gradient(circle at 60% 70%, rgba(200,120,255,0.05), transparent 65%);
+  pointer-events:none;
 }
 
 /* BACKGROUND STARS */
-
 .background-star{
   position:absolute;
   border-radius:50%;
   background:white;
-  opacity:0.7;
+  opacity:0.6;
   animation:twinkle linear infinite;
+  filter: blur(0.2px);
 }
 
 /* STAR GROUP */
-
 .star-group{
   position:absolute;
-  transform-style:preserve-3d;
   transform:translate(-50%, -50%);
   text-align:center;
-  transition:transform 0.2s ease;
-  animation:drift ease-in-out infinite alternate;
+  animation:drift 10s ease-in-out infinite alternate;
 }
 
-/* MAIN STAR */
-
+/* STAR CORE (more Apple glow, less harsh) */
 .star{
-  margin:auto;
+  width:10px;
+  height:10px;
   border-radius:50%;
 
   background:
     radial-gradient(circle,
-    rgba(255,255,255,1) 0%,
-    rgba(255,255,255,0.95) 20%,
-    rgba(255,255,255,0.25) 60%,
-    rgba(255,255,255,0) 100%);
+      rgba(255,255,255,1) 0%,
+      rgba(200,220,255,0.8) 25%,
+      rgba(150,180,255,0.25) 60%,
+      rgba(0,0,0,0) 100%);
 
-  animation:twinkle 4s ease-in-out infinite;
+  box-shadow:
+    0 0 10px rgba(180,200,255,0.35);
 
-  transition:all 0.35s ease;
+  transition:transform 0.35s ease, box-shadow 0.35s ease;
 }
 
-/* STAR SIZES */
+/* HOVER STAR GLOW (Apple-style bloom) */
+.star-group:hover .star{
+  transform:scale(2.6);
 
-.small{
-  width:6px;
-  height:6px;
+  box-shadow:
+    0 0 18px rgba(255,255,255,0.9),
+    0 0 45px rgba(120,180,255,0.6),
+    0 0 90px rgba(150,120,255,0.25);
 }
 
-.medium{
-  width:10px;
-  height:10px;
-}
-
-.large{
-  width:16px;
-  height:16px;
-}
-
-/* LABELS */
-
+/* LABEL (frosted glass tooltip) */
 .label{
-  margin-top:14px;
+  margin-top:12px;
+  width:240px;
 
-  opacity:0;
+  padding:10px 12px;
+  border-radius:14px;
 
   font-size:0.82rem;
-  line-height:1.5;
+  line-height:1.45;
 
-  width:220px;
+  color:rgba(255,255,255,0.72);
 
-  color:rgba(255,255,255,0.75);
+  opacity:0;
 
   transform:
     translateY(10px)
-    scale(0.95);
+    scale(0.96);
 
-  transition:all 0.35s ease;
+  transition:all 0.4s ease;
 
   pointer-events:none;
 
-  text-shadow:
-    0 0 10px rgba(255,255,255,0.15);
-}
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.10);
 
-/* HOVER EFFECTS */
-
-.star-group:hover{
-  z-index:999;
-}
-
-.star-group:hover .star{
-
-  transform:scale(2.8);
+  backdrop-filter: blur(10px);
 
   box-shadow:
-    0 0 15px white,
-    0 0 35px rgba(255,255,255,0.9),
-    0 0 80px rgba(100,150,255,0.9);
-
+    0 10px 30px rgba(0,0,0,0.35);
 }
 
+/* LABEL HOVER STATE */
 .star-group:hover .label{
-
   opacity:1;
-
-  transform:
-    translateY(-4px)
-    scale(1);
-
-  color:white;
-
-  text-shadow:
-    0 0 10px white,
-    0 0 22px rgba(100,150,255,0.8);
-
+  transform:translateY(-6px) scale(1);
+  color:rgba(255,255,255,0.95);
 }
 
-/* INFO PANEL */
-
+/* INFO PANEL (already Apple-like, now refined) */
 .info-panel{
-
   position:absolute;
-
   right:30px;
   bottom:30px;
-
   width:340px;
-
   padding:22px;
 
-  border-radius:20px;
+  border-radius:22px;
 
-  background:
-    rgba(255,255,255,0.06);
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.10);
 
-  backdrop-filter:blur(10px);
-
-  border:
-    1px solid rgba(255,255,255,0.08);
-
-  color:
-    rgba(255,255,255,0.88);
-
-  z-index:1000;
+  backdrop-filter: blur(14px);
 
   box-shadow:
-    0 0 30px rgba(0,0,0,0.45);
+    0 20px 60px rgba(0,0,0,0.45);
+
+  color:rgba(255,255,255,0.88);
+
+  transform: translateY(20px);
+  opacity:0;
+
+  animation:panelIn 1s ease forwards 0.3s;
 }
 
 .info-panel h2{
-  margin-bottom:12px;
   font-weight:400;
+  margin-bottom:10px;
   letter-spacing:1px;
 }
 
-/* SHOOTING STAR */
-
-.shooting-star{
-
-  position:absolute;
-
-  width:180px;
-  height:2px;
-
-  background:
-    linear-gradient(to right,
-    white,
-    transparent);
-
-  opacity:0;
-
-  transform:rotate(-25deg);
-
-  animation:shooting 11s linear infinite;
-}
-
 /* ANIMATIONS */
-
 @keyframes twinkle{
-
-  0%{ opacity:0.45; }
-
+  0%{ opacity:0.35; }
   50%{ opacity:1; }
-
-  100%{ opacity:0.45; }
+  100%{ opacity:0.35; }
 }
-
-@keyframes shooting{
-
-  0%{
-    top:-10%;
-    left:-20%;
-    opacity:0;
-  }
-
-  5%{
-    opacity:1;
-  }
-
-  15%{
-    top:40%;
-    left:120%;
-    opacity:0;
-  }
-
-  100%{
-    opacity:0;
-  }
-}
-
-/* SUBTLE SPACE DRIFT */
 
 @keyframes drift{
+  0%{ transform:translate(-50%,-50%) translate(0px,0px); }
+  100%{ transform:translate(-50%,-50%) translate(3px,2px); }
+}
 
-  0%{
-    transform:
-      translate(-50%, -50%)
-      translateX(-3px)
-      translateY(-2px);
-  }
-
-  50%{
-    transform:
-      translate(-50%, -50%)
-      translateX(2px)
-      translateY(3px);
-  }
-
-  100%{
-    transform:
-      translate(-50%, -50%)
-      translateX(-2px)
-      translateY(1px);
+@keyframes panelIn{
+  to{
+    transform:translateY(0);
+    opacity:1;
   }
 }
 
@@ -298,197 +214,129 @@ h1{
 
 <div class="sky" id="sky">
 
-  <div class="shooting-star"></div>
-
-  <!-- PUPPIS -->
-
-  <div class="star-group" style="left:18%; top:58%; animation-duration:9s;">
-    <div class="star large"></div>
-
-    <div class="label">
-      <strong>Naos</strong><br>
-      A luminous blue supergiant approximately
-      1,090 light-years from Earth. One of the
-      brightest stars in Puppis and over
-      700,000 times more luminous than the Sun.
-    </div>
+<!-- PUPPIS -->
+<div class="star-group" style="left:18%; top:58%;">
+  <div class="star"></div>
+  <div class="label">
+    <b>Naos</b><br>
+    Blue supergiant ~1,000 light-years away.
+    One of the most luminous known stars in Puppis.
   </div>
+</div>
 
-  <div class="star-group" style="left:28%; top:48%; animation-duration:11s;">
-    <div class="star medium"></div>
-
-    <div class="label">
-      <strong>Suhail</strong><br>
-      Historically used by navigators across
-      the southern oceans. Its Arabic name
-      refers to brightness and smoothness in
-      the night sky.
-    </div>
+<div class="star-group" style="left:28%; top:48%;">
+  <div class="star"></div>
+  <div class="label">
+    <b>Suhail</b><br>
+    Ancient southern navigation star used by Arabian and maritime explorers.
   </div>
+</div>
 
-  <div class="star-group" style="left:38%; top:62%; animation-duration:10s;">
-    <div class="star medium"></div>
-
-    <div class="label">
-      <strong>Tureis</strong><br>
-      A giant yellow-white star in Puppis,
-      visible to the naked eye from the
-      southern hemisphere during summer months.
-    </div>
+<div class="star-group" style="left:38%; top:62%;">
+  <div class="star"></div>
+  <div class="label">
+    <b>Tureis</b><br>
+    Yellow-white giant star visible in southern skies during summer.
   </div>
+</div>
 
-  <!-- ORION -->
-
-  <div class="star-group" style="left:65%; top:24%; animation-duration:12s;">
-    <div class="star large"></div>
-
-    <div class="label">
-      <strong>Betelgeuse</strong><br>
-      A massive red supergiant nearing the end
-      of its life cycle. If placed at the center
-      of our Solar System, it would extend
-      beyond Jupiter’s orbit.
-    </div>
+<!-- ORION -->
+<div class="star-group" style="left:65%; top:24%;">
+  <div class="star"></div>
+  <div class="label">
+    <b>Betelgeuse</b><br>
+    Red supergiant nearing the end of its life.
+    Would engulf inner planets if placed in our Solar System.
   </div>
+</div>
 
-  <div class="star-group" style="left:75%; top:46%; animation-duration:8s;">
-    <div class="star large"></div>
-
-    <div class="label">
-      <strong>Rigel</strong><br>
-      A brilliant blue-white supergiant roughly
-      860 light-years away. It radiates tens of
-      thousands of times more energy than the Sun.
-    </div>
+<div class="star-group" style="left:75%; top:46%;">
+  <div class="star"></div>
+  <div class="label">
+    <b>Rigel</b><br>
+    Extremely luminous blue supergiant ~860 light-years away.
   </div>
+</div>
 
-  <div class="star-group" style="left:70%; top:35%; animation-duration:9.5s;">
-    <div class="star medium"></div>
-
-    <div class="label">
-      <strong>Alnilam</strong><br>
-      The central star in Orion’s Belt.
-      Extremely luminous and visible across
-      vast interstellar distances.
-    </div>
+<div class="star-group" style="left:70%; top:35%;">
+  <div class="star"></div>
+  <div class="label">
+    <b>Alnilam</b><br>
+    Central belt star of Orion, far more massive than the Sun.
   </div>
+</div>
 
-  <!-- CRUX -->
-
-  <div class="star-group" style="left:86%; top:75%; animation-duration:13s;">
-    <div class="star large"></div>
-
-    <div class="label">
-      <strong>Acrux</strong><br>
-      The brightest star in the Southern Cross.
-      Actually a multiple star system composed
-      of intensely hot blue stars.
-    </div>
+<!-- CRUX -->
+<div class="star-group" style="left:86%; top:75%;">
+  <div class="star"></div>
+  <div class="label">
+    <b>Acrux</b><br>
+    Brightest star in the Southern Cross system.
+    Actually a multi-star system of hot blue stars.
   </div>
+</div>
 
-  <div class="star-group" style="left:82%; top:66%; animation-duration:11s;">
-    <div class="star medium"></div>
-
-    <div class="label">
-      <strong>Mimosa</strong><br>
-      A hot blue giant star with rapid rotation
-      and strong ultraviolet radiation emissions.
-    </div>
+<div class="star-group" style="left:82%; top:66%;">
+  <div class="star"></div>
+  <div class="label">
+    <b>Mimosa</b><br>
+    Hot blue giant with intense ultraviolet output.
   </div>
+</div>
 
-  <!-- CANIS MAJOR -->
-
-  <div class="star-group" style="left:54%; top:72%; animation-duration:10s;">
-    <div class="star large"></div>
-
-    <div class="label">
-      <strong>Sirius</strong><br>
-      The brightest star visible in Earth’s
-      night sky. Located only 8.6 light-years
-      away and part of a binary star system.
-    </div>
+<!-- CANIS MAJOR -->
+<div class="star-group" style="left:54%; top:72%;">
+  <div class="star"></div>
+  <div class="label">
+    <b>Sirius</b><br>
+    Brightest star in the night sky.
+    A binary system just 8.6 light-years away.
   </div>
+</div>
 
-  <div class="star-group" style="left:61%; top:65%; animation-duration:12s;">
-    <div class="star medium"></div>
-
-    <div class="label">
-      <strong>Adhara</strong><br>
-      An enormous blue-white giant star once
-      considered among the brightest stars
-      visible from Earth thousands of years ago.
-    </div>
+<div class="star-group" style="left:61%; top:65%;">
+  <div class="star"></div>
+  <div class="label">
+    <b>Adhara</b><br>
+    Massive blue-white star once among the brightest in Earth’s sky.
   </div>
+</div>
 
 </div>
 
 <!-- INFO PANEL -->
-
 <div class="info-panel">
-
   <h2>Interactive Sky</h2>
-
   <p>
-    Move your mouse to tilt the sky gently in 3D.
-    Hover over stars to reveal detailed
-    astronomical descriptions.
-    Stars subtly drift and shimmer to create
-    a living celestial atmosphere.
+    A soft immersive sky rendered in a glass-like aesthetic.
+    Hover stars to reveal astrophysical detail.
+    Designed with a modern Apple-style visual language:
+    depth, blur, glow, and minimal contrast.
   </p>
-
 </div>
 
 <script>
 
 /* BACKGROUND STARS */
-
 const sky = document.getElementById("sky");
 
-for(let i = 0; i < 240; i++){
+for(let i = 0; i < 260; i++){
 
-  const star =
-    document.createElement("div");
-
+  const star = document.createElement("div");
   star.classList.add("background-star");
 
-  const size =
-    Math.random() * 3;
+  const size = Math.random() * 2.5;
 
-  star.style.width =
-    size + "px";
+  star.style.width = size + "px";
+  star.style.height = size + "px";
 
-  star.style.height =
-    size + "px";
+  star.style.left = Math.random() * 100 + "%";
+  star.style.top = Math.random() * 100 + "%";
 
-  star.style.left =
-    Math.random() * 100 + "%";
-
-  star.style.top =
-    Math.random() * 100 + "%";
-
-  star.style.animationDuration =
-    (2 + Math.random() * 5) + "s";
+  star.style.animationDuration = (2 + Math.random() * 6) + "s";
 
   sky.appendChild(star);
 }
-
-/* 3D PARALLAX */
-
-document.addEventListener("mousemove", (e)=>{
-
-  const x =
-    (e.clientX / window.innerWidth - 0.5);
-
-  const y =
-    (e.clientY / window.innerHeight - 0.5);
-
-  sky.style.transform =
-    `
-    rotateY(${x * 8}deg)
-    rotateX(${-y * 8}deg)
-    `;
-
-});
 
 </script>
 
