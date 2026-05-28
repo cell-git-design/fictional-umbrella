@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<title>3D Night Sky - Planetarium Mode</title>
+<title>Interactive Southern Sky</title>
 
 <style>
 
@@ -16,29 +16,27 @@
 
 body{
   overflow:hidden;
-  background: radial-gradient(circle at bottom,
-    #0b1430 0%,
-    #05060c 50%,
-    #000000 100%);
+  background:
+    radial-gradient(circle at bottom,
+    #16213d 0%,
+    #090b14 45%,
+    #020305 100%);
   font-family:Arial, sans-serif;
+  height:100vh;
   color:white;
 }
 
-/* TITLE */
-
 h1{
   position:absolute;
-  top:18px;
+  top:20px;
   width:100%;
   text-align:center;
+  font-size:2.5rem;
+  letter-spacing:4px;
   font-weight:300;
-  letter-spacing:5px;
-  font-size:2.4rem;
   z-index:1000;
-  text-shadow:0 0 25px rgba(120,180,255,0.5);
+  text-shadow:0 0 25px rgba(120,160,255,0.6);
 }
-
-/* SKY CONTAINER */
 
 .sky{
   position:relative;
@@ -54,8 +52,8 @@ h1{
   position:absolute;
   transform:translate(-50%, -50%);
   text-align:center;
-  transition:transform 0.15s ease;
-  animation:drift 10s ease-in-out infinite alternate;
+  transition:transform 0.2s ease;
+  animation:drift 8s ease-in-out infinite alternate;
 }
 
 .star{
@@ -64,47 +62,49 @@ h1{
   border-radius:50%;
   background:white;
   box-shadow:0 0 12px white;
-  transition:transform 0.25s ease;
+  margin:auto;
+  transition:all 0.3s ease;
 }
 
 .star-group:hover .star{
-  transform:scale(2.8);
-  box-shadow:
-    0 0 25px white,
-    0 0 60px rgba(120,180,255,0.8);
+  transform:scale(2.6);
+  box-shadow:0 0 25px white, 0 0 60px rgba(120,160,255,0.8);
 }
 
-/* LABEL */
+/* STAR LABEL (DESCRIPTION) */
 
 .label{
   margin-top:10px;
-  width:240px;
+  width:220px;
   font-size:0.8rem;
   opacity:0;
   transform:translateY(10px);
-  transition:all 0.3s ease;
-  color:rgba(255,255,255,0.7);
+  transition:all 0.35s ease;
   pointer-events:none;
+  color:rgba(255,255,255,0.7);
 }
 
 .star-group:hover .label{
   opacity:1;
-  transform:translateY(-6px);
+  transform:translateY(-5px);
   color:white;
 }
 
-/* CONSTELLATION LABEL */
+/* CONSTELLATION NAME POPUP */
 
 .constellation-label{
   position:absolute;
   padding:10px 14px;
-  background:rgba(0,0,0,0.5);
-  border:1px solid rgba(255,255,255,0.15);
   border-radius:12px;
+  background:rgba(0,0,0,0.6);
+  border:1px solid rgba(255,255,255,0.15);
   backdrop-filter:blur(8px);
+  font-size:1rem;
   opacity:0;
+  transform:translateY(-10px);
   transition:all 0.3s ease;
   pointer-events:none;
+  z-index:2000;
 }
 
 /* SVG LINES */
@@ -118,20 +118,20 @@ svg{
 
 path{
   fill:none;
-  stroke:rgba(170,220,255,0.85);
-  stroke-width:2.2;
-  filter:drop-shadow(0 0 8px rgba(120,180,255,0.8));
-  stroke-dasharray:1000;
-  stroke-dashoffset:1000;
+  stroke:rgba(180,220,255,0.85);
+  stroke-width:2;
+  filter:drop-shadow(0 0 6px rgba(120,160,255,0.8));
+  stroke-dasharray:600;
+  stroke-dashoffset:600;
+  transition:stroke-dashoffset 0.8s ease, opacity 0.5s ease;
   opacity:0;
-  transition:stroke-dashoffset 1s ease, opacity 0.4s ease;
 }
 
-/* DRIFT */
+/* BACKGROUND DRIFT */
 
 @keyframes drift{
   0%{ transform:translate(-50%,-50%) translate(0px,0px); }
-  100%{ transform:translate(-50%,-50%) translate(3px,2px); }
+  100%{ transform:translate(-50%,-50%) translate(2px,3px); }
 }
 
 </style>
@@ -139,43 +139,60 @@ path{
 
 <body>
 
-<h1>Planetarium Sky Viewer</h1>
+<h1>Southern Night Sky</h1>
 
 <div class="sky" id="sky">
 
 <svg id="lines"></svg>
-<div id="label" class="constellation-label"></div>
+
+<div id="constellationLabel" class="constellation-label"></div>
+
+<!-- PUPPIS -->
+<div class="star-group" data-constellation="Puppis" data-order="1" style="left:18%; top:58%;">
+  <div class="star"></div>
+  <div class="label"><b>Naos</b><br>Blue supergiant ~1,000 ly away</div>
+</div>
+
+<div class="star-group" data-constellation="Puppis" data-order="2" style="left:28%; top:48%;">
+  <div class="star"></div>
+  <div class="label"><b>Suhail</b><br>Ancient navigation star of the south seas</div>
+</div>
+
+<div class="star-group" data-constellation="Puppis" data-order="3" style="left:38%; top:62%;">
+  <div class="star"></div>
+  <div class="label"><b>Tureis</b><br>Yellow-white giant star</div>
+</div>
 
 <!-- ORION -->
-<div class="star-group" data-c="Orion" data-o="1" style="left:65%; top:25%;">
+<div class="star-group" data-constellation="Orion" data-order="1" style="left:65%; top:24%;">
   <div class="star"></div>
   <div class="label"><b>Betelgeuse</b><br>Red supergiant nearing supernova stage</div>
 </div>
 
-<div class="star-group" data-c="Orion" data-o="2" style="left:70%; top:38%;">
+<div class="star-group" data-constellation="Orion" data-order="2" style="left:70%; top:35%;">
   <div class="star"></div>
-  <div class="label"><b>Alnilam</b><br>Central belt star of Orion</div>
+  <div class="label"><b>Alnilam</b><br>Central Belt star of Orion</div>
 </div>
 
-<div class="star-group" data-c="Orion" data-o="3" style="left:76%; top:50%;">
+<div class="star-group" data-constellation="Orion" data-order="3" style="left:75%; top:46%;">
   <div class="star"></div>
-  <div class="label"><b>Rigel</b><br>Blue supergiant ~860 ly away</div>
+  <div class="label"><b>Rigel</b><br>Blue supergiant, extremely luminous</div>
 </div>
 
 <!-- CRUX -->
-<div class="star-group" data-c="Crux" data-o="1" style="left:82%; top:66%;">
+<div class="star-group" data-constellation="Crux" data-order="1" style="left:82%; top:66%;">
   <div class="star"></div>
   <div class="label"><b>Mimosa</b><br>Hot blue giant star</div>
 </div>
 
-<div class="star-group" data-c="Crux" data-o="2" style="left:86%; top:75%;">
+<div class="star-group" data-constellation="Crux" data-order="2" style="left:86%; top:75%;">
   <div class="star"></div>
-  <div class="label"><b>Acrux</b><br>Brightest star in Southern Cross</div>
+  <div class="label"><b>Acrux</b><br>Brightest star in the Southern Cross</div>
 </div>
 
-<div class="star-group" data-c="Crux" data-o="3" style="left:90%; top:66%;">
+<div class="star-group" data-constellation="Crux" data-order="3" style="left:90%; top:66%;">
   <div class="star"></div>
-  <div class="label"><b>Gacrux</b><br>Red giant marking top of cross</div>
+  <div class="label"><b>Gacrux</b><br>Red giant marking the top of the Cross</div>
 </div>
 
 </div>
@@ -184,53 +201,32 @@ path{
 
 const sky = document.getElementById("sky");
 const svg = document.getElementById("lines");
-const label = document.getElementById("label");
+const label = document.getElementById("constellationLabel");
 
-let mouseX = 0;
-let mouseY = 0;
-let smoothX = 0;
-let smoothY = 0;
+let activePaths = [];
 
-/* -----------------------------
-MOUSE + INERTIA CAMERA
------------------------------ */
+/* CREATE CONSTELLATION PATH */
 
-document.addEventListener("mousemove", (e)=>{
+function drawConstellation(name, stars){
 
-  mouseX = (e.clientX / window.innerWidth - 0.5);
-  mouseY = (e.clientY / window.innerHeight - 0.5);
+  const sorted =
+    [...stars].sort((a,b)=>
+      a.dataset.order - b.dataset.order
+    );
 
-});
-
-function animateSky(){
-
-  smoothX += (mouseX - smoothX) * 0.05;
-  smoothY += (mouseY - smoothY) * 0.05;
-
-  sky.style.transform =
-    `rotateY(${smoothX * 12}deg)
-     rotateX(${-smoothY * 12}deg)`;
-
-  requestAnimationFrame(animateSky);
-}
-
-animateSky();
-
-/* -----------------------------
-BUILD CONSTELLATION CURVES
-(using smooth quadratic curves)
------------------------------ */
-
-function drawCurve(points){
+  const points =
+    sorted.map(s=>{
+      const rect = s.getBoundingClientRect();
+      return {
+        x: rect.left + rect.width/2,
+        y: rect.top + rect.height/2
+      };
+    });
 
   let d = `M ${points[0].x} ${points[0].y}`;
 
-  for(let i=1;i<points.length-1;i++){
-
-    const midX = (points[i].x + points[i+1].x) / 2;
-    const midY = (points[i].y + points[i+1].y) / 2;
-
-    d += ` Q ${points[i].x} ${points[i].y} ${midX} ${midY}`;
+  for(let i=1;i<points.length;i++){
+    d += ` L ${points[i].x} ${points[i].y}`;
   }
 
   const path = document.createElementNS(
@@ -239,83 +235,116 @@ function drawCurve(points){
   );
 
   path.setAttribute("d", d);
+
   svg.appendChild(path);
 
   requestAnimationFrame(()=>{
+
     path.style.opacity = 1;
     path.style.strokeDashoffset = 0;
+
   });
 
-  return path;
+  activePaths.push(path);
 }
 
-/* -----------------------------
-HOVER LOGIC
------------------------------ */
+/* CLEAR PATHS */
 
-let activePath = null;
+function clearPaths(){
 
-const stars = document.querySelectorAll(".star-group");
+  activePaths.forEach(p=>{
+    p.style.opacity = 0;
+    setTimeout(()=>p.remove(), 500);
+  });
 
-stars.forEach(star=>{
+  activePaths = [];
+}
 
-  star.addEventListener("mouseenter", ()=>{
+/* HOVER LOGIC */
 
-    const c = star.dataset.c;
+const groups = document.querySelectorAll(".star-group");
 
-    const group =
-      [...document.querySelectorAll(`[data-c="${c}"]`)]
-      .sort((a,b)=>a.dataset.o - b.dataset.o);
+groups.forEach(group=>{
 
-    const pts = group.map(el=>{
-      const r = el.getBoundingClientRect();
-      return {
-        x:r.left + r.width/2,
-        y:r.top + r.height/2
-      };
-    });
+  group.addEventListener("mouseenter", ()=>{
 
-    if(activePath){
-      activePath.remove();
-    }
+    clearPaths();
 
-    activePath = drawCurve(pts);
+    const constellation =
+      group.dataset.constellation;
+
+    const stars =
+      [...document.querySelectorAll(
+        `.star-group[data-constellation="${constellation}"]`
+      )];
+
+    drawConstellation(constellation, stars);
 
     label.style.opacity = 1;
-    label.textContent = c;
+    label.innerHTML = constellation;
 
-    const r = star.getBoundingClientRect();
-    label.style.left = r.left + "px";
-    label.style.top = (r.top - 30) + "px";
+    const rect = group.getBoundingClientRect();
+
+    label.style.left = rect.left + "px";
+    label.style.top = rect.top - 30 + "px";
 
   });
 
-  star.addEventListener("mouseleave", ()=>{
+  group.addEventListener("mouseleave", ()=>{
 
-    if(activePath){
-      activePath.style.opacity = 0;
-      setTimeout(()=>activePath.remove(), 400);
-      activePath = null;
-    }
-
+    clearPaths();
     label.style.opacity = 0;
 
   });
 
 });
+/* BACKGROUND STARS */
 
-/* -----------------------------
-ZOOM (scroll = depth illusion)
------------------------------ */
+const sky = document.getElementById("sky");
 
-let zoom = 1;
+for(let i = 0; i < 240; i++){
 
-document.addEventListener("wheel", (e)=>{
+  const star =
+    document.createElement("div");
 
-  zoom += e.deltaY * -0.001;
-  zoom = Math.min(Math.max(0.7, zoom), 1.6);
+  star.classList.add("background-star");
 
-  sky.style.transform += ` scale(${zoom})`;
+  const size =
+    Math.random() * 3;
+
+  star.style.width =
+    size + "px";
+
+  star.style.height =
+    size + "px";
+
+  star.style.left =
+    Math.random() * 100 + "%";
+
+  star.style.top =
+    Math.random() * 100 + "%";
+
+  star.style.animationDuration =
+    (2 + Math.random() * 5) + "s";
+
+  sky.appendChild(star);
+}
+
+/* 3D PARALLAX */
+
+document.addEventListener("mousemove", (e)=>{
+
+  const x =
+    (e.clientX / window.innerWidth - 0.5);
+
+  const y =
+    (e.clientY / window.innerHeight - 0.5);
+
+  sky.style.transform =
+    `
+    rotateY(${x * 8}deg)
+    rotateX(${-y * 8}deg)
+    `;
 
 });
 
