@@ -466,10 +466,22 @@ h1{
   </div>
 
   <!-- CANIS MAJOR -->
-  <div class="star-group" style="left:54%; top:72%;">
-    <div class="star large"></div>
-    <div class="label"><b>Sirius</b><br>Brightest star in the night sky.</div>
+    <div class="star-group"
+     style="left:54%; top:72%;"
+     onclick="
+       openImageViewer(
+         '"C:\Users\sbfre\Downloads\133592261775502945.jpg"',
+         'Sirius • Brightest Star in the Night Sky'
+       )
+     ">
+
+  <div class="star large"></div>
+
+  <div class="label">
+    <b>Sirius</b><br>
+    Brightest star in the night sky.
   </div>
+
 </div>
 
 <div class="info-panel">
@@ -647,7 +659,221 @@ function updateCounter(){
 
 updateCounter();
 setInterval(updateCounter, 1000);
+
+function openImageViewer(src, caption){
+
+  const overlay =
+    document.getElementById("imageOverlay");
+
+  document.getElementById("featuredImage").src = src;
+
+  document.getElementById("imageCaption").innerHTML =
+    caption || "";
+
+  overlay.classList.add("active");
+}
+
+function closeImageViewer(){
+
+  document
+    .getElementById("imageOverlay")
+    .classList.remove("active");
+}
+
+/* close if background clicked */
+
+document
+.getElementById("imageOverlay")
+.addEventListener("click", function(e){
+
+  if(e.target === this){
+    closeImageViewer();
+  }
+
+});
+
+/* ==========================
+   CELESTIAL IMAGE VIEWER
+========================== */
+
+.image-overlay{
+  position:fixed;
+  inset:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(120,180,255,0.08),
+      rgba(0,0,0,0.82)
+    );
+
+  backdrop-filter:blur(14px);
+
+  opacity:0;
+  visibility:hidden;
+
+  transition:
+    opacity 0.5s ease,
+    visibility 0.5s ease;
+
+  z-index:10000;
+}
+
+.image-overlay.active{
+  opacity:1;
+  visibility:visible;
+}
+
+.image-panel{
+  position:relative;
+
+  width:min(1000px, 80vw);
+  height:min(700px, 80vh);
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:32px;
+
+  background:
+    rgba(255,255,255,0.06);
+
+  border:
+    1px solid rgba(255,255,255,0.12);
+
+  backdrop-filter:blur(18px);
+
+  box-shadow:
+    0 30px 80px rgba(0,0,0,0.55);
+
+  overflow:hidden;
+
+  transform:
+    scale(0.9);
+
+  transition:
+    transform 0.5s ease;
+}
+
+.image-overlay.active .image-panel{
+  transform:scale(1);
+}
+
+/* celestial glow */
+
+.image-glow{
+  position:absolute;
+
+  width:700px;
+  height:700px;
+
+  border-radius:50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(140,190,255,0.20),
+      rgba(180,120,255,0.10),
+      transparent 70%
+    );
+
+  filter:blur(60px);
+
+  pointer-events:none;
+}
+
+.image-panel img{
+  position:relative;
+  z-index:2;
+
+  max-width:90%;
+  max-height:78%;
+
+  border-radius:24px;
+
+  object-fit:contain;
+
+  box-shadow:
+    0 0 40px rgba(180,220,255,0.25),
+    0 0 100px rgba(160,120,255,0.15);
+}
+
+.image-caption{
+  position:relative;
+  z-index:2;
+
+  margin-top:22px;
+
+  font-size:1rem;
+  font-weight:300;
+  letter-spacing:2px;
+
+  color:rgba(255,255,255,0.92);
+}
+
+.close-image{
+  position:absolute;
+
+  top:18px;
+  right:18px;
+
+  width:42px;
+  height:42px;
+
+  border:none;
+  border-radius:50%;
+
+  cursor:pointer;
+
+  background:
+    rgba(255,255,255,0.08);
+
+  color:white;
+
+  backdrop-filter:blur(10px);
+
+  transition:all 0.3s ease;
+
+  z-index:5;
+}
+
+.close-image:hover{
+  background:
+    rgba(255,255,255,0.18);
+
+  transform:scale(1.08);
+}
   
 </script>
 </body>
+
+  <!-- ==========================
+     CELESTIAL IMAGE VIEWER
+========================== -->
+
+<div id="imageOverlay" class="image-overlay">
+
+  <div class="image-panel">
+
+    <button class="close-image" onclick="closeImageViewer()">
+      ✕
+    </button>
+
+    <div class="image-glow"></div>
+
+    <img id="featuredImage" src="" alt="Constellation Image">
+
+    <div class="image-caption" id="imageCaption">
+      Southern Sky Object
+    </div>
+
+  </div>
+
+</div>
 </html>
