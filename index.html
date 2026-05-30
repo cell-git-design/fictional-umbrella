@@ -1,21 +1,22 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-
 <title>Interactive Southern Sky</title>
 
 <style>
+:root{
+  --star-scale: 1;
+  --hover-scale: 2.7;
+  --glow-multiplier: 1;
+  --nebula-opacity: 1;
+}
 
-/* ================================
-   APPLE SYSTEM TYPOGRAPHY RESET
-================================= */
 *{
   margin:0;
   padding:0;
   box-sizing:border-box;
-
   font-family:
     -apple-system,
     BlinkMacSystemFont,
@@ -25,43 +26,107 @@
     Helvetica,
     Arial,
     sans-serif;
-
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ================================
-   BODY (SOFT APPLE SPACE AESTHETIC)
-================================= */
 body{
   overflow:hidden;
   height:100vh;
   color:white;
-
   background:
     radial-gradient(circle at 30% 20%, rgba(120,160,255,0.10), transparent 55%),
     radial-gradient(circle at 70% 80%, rgba(180,90,255,0.08), transparent 60%),
     radial-gradient(circle at bottom, #0b1020 0%, #05060c 45%, #000000 100%);
 }
 
-/* ================================
-   TITLE (SF PRO DISPLAY STYLE)
-================================= */
 h1{
   position:absolute;
-  top:22px;
+  top:18px;
   width:100%;
   text-align:center;
-  z-index:1000;
-
+  z-index:3000;
   font-weight:300;
   font-size:2.5rem;
   letter-spacing:6px;
-
   color:rgba(255,255,255,0.92);
+  text-shadow:0 0 20px rgba(120,180,255,0.35);
+}
 
-  text-shadow:
-    0 0 20px rgba(120,180,255,0.35);
+/* ================================
+   CONTROL MENU
+================================= */
+.control-bar{
+  position:fixed;
+  top:78px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:4000;
+
+  width:min(1180px, calc(100vw - 24px));
+  padding:14px 16px;
+
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px 16px;
+  justify-content:center;
+  align-items:end;
+
+  border-radius:22px;
+  background:rgba(255,255,255,0.07);
+  border:1px solid rgba(255,255,255,0.12);
+  backdrop-filter:blur(16px);
+  box-shadow:0 18px 50px rgba(0,0,0,0.35);
+}
+
+.control-group{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  min-width:150px;
+}
+
+.control-group label{
+  font-size:0.72rem;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,0.78);
+}
+
+.control-group small{
+  font-size:0.75rem;
+  color:rgba(255,255,255,0.65);
+}
+
+.control-bar input[type="range"]{
+  width:160px;
+  accent-color:#b8d4ff;
+}
+
+.control-bar select{
+  min-width:150px;
+  padding:9px 10px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.14);
+  background:rgba(255,255,255,0.08);
+  color:white;
+  outline:none;
+}
+
+.control-toggle{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:0.88rem;
+  color:rgba(255,255,255,0.88);
+  padding:8px 10px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.10);
+  background:rgba(255,255,255,0.05);
+}
+
+.control-toggle input{
+  accent-color:#c9e0ff;
 }
 
 /* ================================
@@ -76,7 +141,6 @@ h1{
   perspective:1200px;
 }
 
-/* subtle nebula haze layer */
 .sky::before{
   content:'';
   position:absolute;
@@ -84,11 +148,10 @@ h1{
   height:200%;
   top:-50%;
   left:-50%;
-
+  opacity:var(--nebula-opacity);
   background:
     radial-gradient(circle at 40% 40%, rgba(120,160,255,0.08), transparent 60%),
     radial-gradient(circle at 60% 70%, rgba(200,120,255,0.05), transparent 65%);
-
   pointer-events:none;
 }
 
@@ -103,6 +166,10 @@ h1{
   animation:twinkle linear infinite;
 }
 
+.twinkle-off .background-star{
+  animation:none;
+}
+
 /* ================================
    STAR GROUP
 ================================= */
@@ -115,276 +182,38 @@ h1{
 }
 
 /* ================================
-   FLOWER POSITIONING FIX
-================================= */
-
-.flower{
-  position:absolute;
-
-  /* centered above star */
-  left:50%;
-  top:-78px;
-
-  width:64px;
-  height:64px;
-
-  transform:
-    translateX(-50%)
-    scale(0.2);
-
-  transform-origin:center bottom;
-
-  opacity:0;
-  pointer-events:none;
-
-  transition:
-    transform 0.45s ease,
-    opacity 0.35s ease;
-
-  filter:
-    drop-shadow(0 0 12px rgba(255,255,255,0.25));
-}
-
-/* ================================
-   STEM
-================================= */
-
-.flower::before{
-  content:'';
-
-  position:absolute;
-
-  left:50%;
-  bottom:-26px;
-
-  width:3px;
-  height:0px;
-
-  transform:translateX(-50%);
-
-  border-radius:999px;
-
-  background:
-    linear-gradient(
-      to top,
-      rgba(140,255,180,0.15),
-      rgba(160,255,200,0.95),
-      rgba(230,255,240,1)
-    );
-
-  box-shadow:
-    0 0 10px rgba(160,255,200,0.55);
-
-  transition:
-    height 0.45s ease;
-}
-
-/* ================================
-   FLOWER CENTER / BUD
-================================= */
-
-.flower::after{
-  content:'';
-
-  position:absolute;
-
-  left:50%;
-  top:50%;
-
-  width:14px;
-  height:14px;
-
-  transform:
-    translate(-50%, -50%);
-
-  border-radius:50%;
-
-  background:
-    radial-gradient(circle,
-      rgba(255,255,255,1) 0%,
-      rgba(255,245,170,0.95) 30%,
-      rgba(255,210,100,0.65) 70%,
-      rgba(255,210,100,0.0) 100%);
-
-  box-shadow:
-    0 0 12px rgba(255,220,120,0.8),
-    0 0 28px rgba(255,180,140,0.35);
-
-  z-index:3;
-}
-
-/* ================================
-   PETALS
-================================= */
-
-.flower span{
-  position:absolute;
-
-  left:50%;
-  top:50%;
-
-  width:13px;
-  height:26px;
-
-  margin-left:-6.5px;
-  margin-top:-13px;
-
-  border-radius:
-    999px
-    999px
-    70%
-    70%;
-
-  background:
-    radial-gradient(circle at 50% 30%,
-      rgba(255,255,255,0.98) 0%,
-      rgba(255,210,235,0.92) 30%,
-      rgba(255,140,205,0.72) 70%,
-      rgba(255,140,205,0.0) 100%);
-
-  transform-origin:
-    center
-    28px;
-
-  opacity:0;
-}
-
-/* evenly distribute petals */
-.flower span:nth-child(1){
-  transform:
-    translate(-50%, -50%)
-    rotate(0deg)
-    translateY(-20px)
-    scale(0.2);
-}
-
-.flower span:nth-child(2){
-  transform:
-    translate(-50%, -50%)
-    rotate(60deg)
-    translateY(-20px)
-    scale(0.2);
-}
-
-.flower span:nth-child(3){
-  transform:
-    translate(-50%, -50%)
-    rotate(120deg)
-    translateY(-20px)
-    scale(0.2);
-}
-
-.flower span:nth-child(4){
-  transform:
-    translate(-50%, -50%)
-    rotate(180deg)
-    translateY(-20px)
-    scale(0.2);
-}
-
-.flower span:nth-child(5){
-  transform:
-    translate(-50%, -50%)
-    rotate(240deg)
-    translateY(-20px)
-    scale(0.2);
-}
-
-.flower span:nth-child(6){
-  transform:
-    translate(-50%, -50%)
-    rotate(300deg)
-    translateY(-20px)
-    scale(0.2);
-}
-
-/* ================================
-   HOVER STATE
-================================= */
-
-.star-group:hover .flower{
-  opacity:1;
-
-  transform:
-    translateX(-50%)
-    scale(1);
-
-  animation:
-    flowerFloat 1.8s ease-in-out infinite;
-}
-
-/* grow stem from star upward */
-.star-group:hover .flower::before{
-  height:48px;
-}
-
-/* bloom petals */
-.star-group:hover .flower span{
-  animation:
-    petalBloom 0.55s ease forwards;
-}
-
-.star-group:hover .flower span:nth-child(1){ animation-delay:0.00s; }
-.star-group:hover .flower span:nth-child(2){ animation-delay:0.05s; }
-.star-group:hover .flower span:nth-child(3){ animation-delay:0.10s; }
-.star-group:hover .flower span:nth-child(4){ animation-delay:0.15s; }
-.star-group:hover .flower span:nth-child(5){ animation-delay:0.20s; }
-.star-group:hover .flower span:nth-child(6){ animation-delay:0.25s; }
-
-/* ================================
-   PETAL BLOOM ANIMATION
-================================= */
-
-@keyframes petalBloom{
-  0%{
-    opacity:0;
-
-    transform:
-      translate(-50%, -50%)
-      rotate(var(--rot))
-      translateY(-8px)
-      scale(0.1);
-  }
-
-  100%{
-    opacity:1;
-
-    transform:
-      translate(-50%, -50%)
-      rotate(var(--rot))
-      translateY(-20px)
-      scale(1);
-  }
-}
-/* ================================
-   STAR CORE (APPLE-STYLE GLOW)
+   STAR CORE
 ================================= */
 .star{
   margin:auto;
   border-radius:50%;
-
   background:
     radial-gradient(circle,
       rgba(255,255,255,1) 0%,
       rgba(200,220,255,0.85) 25%,
       rgba(150,180,255,0.25) 60%,
       rgba(0,0,0,0) 100%);
-
   box-shadow:
-    0 0 10px rgba(180,200,255,0.35);
-
+    0 0 calc(10px * var(--glow-multiplier)) rgba(180,200,255,0.35);
   transition:transform 0.35s ease, box-shadow 0.35s ease;
 }
 
 /* star sizes */
-.small{ width:6px; height:6px; }
-.medium{ width:10px; height:10px; }
-.large{ width:16px; height:16px; }
+.small{
+  width:calc(6px * var(--star-scale));
+  height:calc(6px * var(--star-scale));
+}
+.medium{
+  width:calc(10px * var(--star-scale));
+  height:calc(10px * var(--star-scale));
+}
+.large{
+  width:calc(16px * var(--star-scale));
+  height:calc(16px * var(--star-scale));
+}
 
-/* hover glow */
 .star-group:hover .star{
-  transform:scale(2.7);
-
+  transform:scale(var(--hover-scale));
   box-shadow:
     0 0 18px rgba(255,255,255,0.95),
     0 0 45px rgba(120,180,255,0.6),
@@ -392,48 +221,40 @@ h1{
 }
 
 /* ================================
-   LABEL (FROSTED APPLE TOOLTIP)
+   LABEL
 ================================= */
 .label{
   margin-top:14px;
   width:240px;
-
   padding:10px 12px;
   border-radius:14px;
-
   font-size:0.82rem;
   line-height:1.5;
-
   font-weight:400;
   letter-spacing:0.2px;
-
   color:rgba(255,255,255,0.72);
-
   opacity:0;
-
   transform:translateY(10px) scale(0.96);
-
   transition:all 0.4s ease;
-
   pointer-events:none;
-
   background:rgba(255,255,255,0.06);
   border:1px solid rgba(255,255,255,0.10);
-
-  backdrop-filter: blur(12px);
-
+  backdrop-filter:blur(12px);
   box-shadow:0 10px 30px rgba(0,0,0,0.35);
 }
 
-/* label hover */
 .star-group:hover .label{
   opacity:1;
   transform:translateY(-6px) scale(1);
   color:rgba(255,255,255,0.95);
 }
 
+.labels-off .label{
+  display:none;
+}
+
 /* ================================
-   INFO PANEL (MACOS GLASS CARD)
+   INFO PANEL
 ================================= */
 .info-panel{
   position:absolute;
@@ -441,18 +262,12 @@ h1{
   bottom:30px;
   width:340px;
   padding:22px;
-
   border-radius:22px;
-
   background:rgba(255,255,255,0.06);
   border:1px solid rgba(255,255,255,0.10);
-
-  backdrop-filter: blur(14px);
-
+  backdrop-filter:blur(14px);
   box-shadow:0 20px 60px rgba(0,0,0,0.45);
-
   color:rgba(255,255,255,0.88);
-
   animation:panelIn 1s ease forwards 0.3s;
   transform:translateY(20px);
   opacity:0;
@@ -478,13 +293,14 @@ h1{
   position:absolute;
   width:180px;
   height:2px;
-
   background:linear-gradient(to right, white, transparent);
-
   opacity:0;
   transform:rotate(-25deg);
-
   animation:shooting 11s linear infinite;
+}
+
+.shooting-off .shooting-star{
+  display:none;
 }
 
 /* ================================
@@ -515,126 +331,110 @@ h1{
     opacity:1;
   }
 }
-
-@keyframes bloom{
-  0%{
-    transform:translate(-50%, -50%) rotate(var(--rot)) translateY(-10px) scale(0.15);
-    opacity:0;
-  }
-  55%{
-    opacity:1;
-  }
-  100%{
-    transform:translate(-50%, -50%) rotate(var(--rot)) translateY(-16px) scale(1);
-    opacity:0.95;
-  }
-}
-
-@keyframes flowerFloat{
-  0%, 100%{
-    transform:translate(-50%, -50%) scale(1.05) rotate(0deg);
-  }
-  50%{
-    transform:translate(-50%, -50%) scale(1.12) rotate(8deg);
-  }
-}
-
 </style>
 </head>
 
 <body>
-
 <h1>Southern Night Sky</h1>
 
-<div class="sky" id="sky">
+<div class="control-bar">
+  <div class="control-group">
+    <label for="preset">Display preset</label>
+    <select id="preset">
+      <option value="custom">Custom</option>
+      <option value="calm">Calm</option>
+      <option value="standard" selected>Standard</option>
+      <option value="radiant">Radiant</option>
+    </select>
+  </div>
 
+  <div class="control-group">
+    <label for="bgStarCount">Background stars <span id="bgStarCountValue">260</span></label>
+    <input id="bgStarCount" type="range" min="40" max="500" value="260">
+  </div>
+
+  <div class="control-group">
+    <label for="starSize">Star size <span id="starSizeValue">100%</span></label>
+    <input id="starSize" type="range" min="70" max="150" value="100">
+  </div>
+
+  <div class="control-group">
+    <label for="glow">Glow intensity <span id="glowValue">100%</span></label>
+    <input id="glow" type="range" min="60" max="180" value="100">
+  </div>
+
+  <div class="control-group">
+    <label for="nebula">Nebula haze <span id="nebulaValue">100%</span></label>
+    <input id="nebula" type="range" min="0" max="150" value="100">
+  </div>
+
+  <div class="control-toggle">
+    <input id="labelsToggle" type="checkbox" checked>
+    <label for="labelsToggle">Labels</label>
+  </div>
+
+  <div class="control-toggle">
+    <input id="shootToggle" type="checkbox" checked>
+    <label for="shootToggle">Shooting star</label>
+  </div>
+
+  <div class="control-toggle">
+    <input id="twinkleToggle" type="checkbox" checked>
+    <label for="twinkleToggle">Twinkle</label>
+  </div>
+</div>
+
+<div class="sky" id="sky">
   <div class="shooting-star"></div>
 
   <!-- PUPPIS -->
   <div class="star-group" style="left:18%; top:58%;">
-    <div class="flower" style="--rot:0deg;">
-      <span style="--rot:0deg;"></span><span style="--rot:60deg;"></span><span style="--rot:120deg;"></span>
-      <span style="--rot:180deg;"></span><span style="--rot:240deg;"></span><span style="--rot:300deg;"></span>
-    </div>
     <div class="star large"></div>
     <div class="label"><b>Naos</b><br>Blue supergiant ~1,000 light-years away.</div>
   </div>
 
   <div class="star-group" style="left:28%; top:48%;">
-    <div class="flower" style="--rot:0deg;">
-      <span style="--rot:0deg;"></span><span style="--rot:60deg;"></span><span style="--rot:120deg;"></span>
-      <span style="--rot:180deg;"></span><span style="--rot:240deg;"></span><span style="--rot:300deg;"></span>
-    </div>
     <div class="star medium"></div>
     <div class="label"><b>Suhail</b><br>Ancient southern navigation star.</div>
   </div>
 
   <div class="star-group" style="left:38%; top:62%;">
-    <div class="flower" style="--rot:0deg;">
-      <span style="--rot:0deg;"></span><span style="--rot:60deg;"></span><span style="--rot:120deg;"></span>
-      <span style="--rot:180deg;"></span><span style="--rot:240deg;"></span><span style="--rot:300deg;"></span>
-    </div>
     <div class="star medium"></div>
     <div class="label"><b>Tureis</b><br>Yellow-white giant in Puppis.</div>
   </div>
 
   <!-- ORION -->
   <div class="star-group" style="left:65%; top:24%;">
-    <div class="flower" style="--rot:0deg;">
-      <span style="--rot:0deg;"></span><span style="--rot:60deg;"></span><span style="--rot:120deg;"></span>
-      <span style="--rot:180deg;"></span><span style="--rot:240deg;"></span><span style="--rot:300deg;"></span>
-    </div>
     <div class="star large"></div>
     <div class="label"><b>Betelgeuse</b><br>Red supergiant nearing supernova.</div>
   </div>
 
   <div class="star-group" style="left:70%; top:35%;">
-    <div class="flower" style="--rot:0deg;">
-      <span style="--rot:0deg;"></span><span style="--rot:60deg;"></span><span style="--rot:120deg;"></span>
-      <span style="--rot:180deg;"></span><span style="--rot:240deg;"></span><span style="--rot:300deg;"></span>
-    </div>
     <div class="star medium"></div>
     <div class="label"><b>Alnilam</b><br>Central belt star of Orion.</div>
   </div>
 
   <div class="star-group" style="left:75%; top:46%;">
-    <div class="flower" style="--rot:0deg;">
-      <span style="--rot:0deg;"></span><span style="--rot:60deg;"></span><span style="--rot:120deg;"></span>
-      <span style="--rot:180deg;"></span><span style="--rot:240deg;"></span><span style="--rot:300deg;"></span>
-    </div>
     <div class="star large"></div>
     <div class="label"><b>Rigel</b><br>Blue supergiant ~860 light-years away.</div>
   </div>
 
   <!-- CRUX -->
   <div class="star-group" style="left:82%; top:66%;">
-    <div class="flower" style="--rot:0deg;">
-      <span style="--rot:0deg;"></span><span style="--rot:60deg;"></span><span style="--rot:120deg;"></span>
-      <span style="--rot:180deg;"></span><span style="--rot:240deg;"></span><span style="--rot:300deg;"></span>
-    </div>
     <div class="star medium"></div>
     <div class="label"><b>Mimosa</b><br>Hot blue giant star.</div>
   </div>
 
   <div class="star-group" style="left:86%; top:75%;">
-    <div class="flower" style="--rot:0deg;">
-      <span style="--rot:0deg;"></span><span style="--rot:60deg;"></span><span style="--rot:120deg;"></span>
-      <span style="--rot:180deg;"></span><span style="--rot:240deg;"></span><span style="--rot:300deg;"></span>
-    </div>
     <div class="star large"></div>
     <div class="label"><b>Acrux</b><br>Brightest star in Southern Cross.</div>
   </div>
 
   <!-- CANIS MAJOR -->
   <div class="star-group" style="left:54%; top:72%;">
-    <div class="flower" style="--rot:0deg;">
-      <span style="--rot:0deg;"></span><span style="--rot:60deg;"></span><span style="--rot:120deg;"></span>
-      <span style="--rot:180deg;"></span><span style="--rot:240deg;"></span><span style="--rot:300deg;"></span>
-    </div>
     <div class="star large"></div>
     <div class="label"><b>Sirius</b><br>Brightest star in the night sky.</div>
   </div>
-
 </div>
 
 <div class="info-panel">
@@ -642,28 +442,131 @@ h1{
   <p>
     A minimal Apple-style celestial interface.
     Hover stars for detailed astronomical context.
-    Designed with glassmorphism, soft glow, and spatial depth.
+    Use the menu above to change the feel of the sky.
   </p>
 </div>
 
 <script>
-
-/* background stars */
 const sky = document.getElementById("sky");
 
-for(let i=0;i<260;i++){
-  const s=document.createElement("div");
-  s.className="background-star";
-  const size=Math.random()*2.5;
-  s.style.width=size+"px";
-  s.style.height=size+"px";
-  s.style.left=Math.random()*100+"%";
-  s.style.top=Math.random()*100+"%";
-  s.style.animationDuration=(2+Math.random()*6)+"s";
-  sky.appendChild(s);
+const bgStarCount = document.getElementById("bgStarCount");
+const starSize = document.getElementById("starSize");
+const glow = document.getElementById("glow");
+const nebula = document.getElementById("nebula");
+const labelsToggle = document.getElementById("labelsToggle");
+const shootToggle = document.getElementById("shootToggle");
+const twinkleToggle = document.getElementById("twinkleToggle");
+const preset = document.getElementById("preset");
+
+const bgStarCountValue = document.getElementById("bgStarCountValue");
+const starSizeValue = document.getElementById("starSizeValue");
+const glowValue = document.getElementById("glowValue");
+const nebulaValue = document.getElementById("nebulaValue");
+
+function updateReadouts(){
+  bgStarCountValue.textContent = bgStarCount.value;
+  starSizeValue.textContent = `${starSize.value}%`;
+  glowValue.textContent = `${glow.value}%`;
+  nebulaValue.textContent = `${nebula.value}%`;
 }
 
-</script>
+function renderBackgroundStars(count){
+  document.querySelectorAll(".background-star").forEach(el => el.remove());
 
+  const shootingStar = sky.querySelector(".shooting-star");
+
+  for(let i = 0; i < count; i++){
+    const s = document.createElement("div");
+    s.className = "background-star";
+
+    const size = Math.random() * 2.5;
+    s.style.width = size + "px";
+    s.style.height = size + "px";
+    s.style.left = Math.random() * 100 + "%";
+    s.style.top = Math.random() * 100 + "%";
+    s.style.animationDuration = (2 + Math.random() * 6) + "s";
+
+    sky.insertBefore(s, shootingStar);
+  }
+}
+
+function updateSkyStyles(){
+  sky.style.setProperty("--star-scale", (starSize.value / 100));
+  sky.style.setProperty("--glow-multiplier", (glow.value / 100));
+  sky.style.setProperty("--nebula-opacity", (nebula.value / 100));
+  sky.style.setProperty("--hover-scale", "2.7");
+
+  sky.classList.toggle("labels-off", !labelsToggle.checked);
+  sky.classList.toggle("shooting-off", !shootToggle.checked);
+  sky.classList.toggle("twinkle-off", !twinkleToggle.checked);
+
+  updateReadouts();
+}
+
+function applyPreset(name){
+  const settings = {
+    calm: {
+      stars: 120,
+      size: 90,
+      glow: 75,
+      nebula: 55,
+      labels: true,
+      shooting: false,
+      twinkle: true
+    },
+    standard: {
+      stars: 260,
+      size: 100,
+      glow: 100,
+      nebula: 100,
+      labels: true,
+      shooting: true,
+      twinkle: true
+    },
+    radiant: {
+      stars: 380,
+      size: 115,
+      glow: 140,
+      nebula: 130,
+      labels: true,
+      shooting: true,
+      twinkle: true
+    }
+  };
+
+  if(!settings[name]) return;
+
+  const s = settings[name];
+  bgStarCount.value = s.stars;
+  starSize.value = s.size;
+  glow.value = s.glow;
+  nebula.value = s.nebula;
+  labelsToggle.checked = s.labels;
+  shootToggle.checked = s.shooting;
+  twinkleToggle.checked = s.twinkle;
+
+  renderBackgroundStars(Number(bgStarCount.value));
+  updateSkyStyles();
+}
+
+bgStarCount.addEventListener("input", () => {
+  renderBackgroundStars(Number(bgStarCount.value));
+  updateSkyStyles();
+});
+
+[starSize, glow, nebula, labelsToggle, shootToggle, twinkleToggle].forEach(el => {
+  el.addEventListener("input", updateSkyStyles);
+  el.addEventListener("change", updateSkyStyles);
+});
+
+preset.addEventListener("change", () => {
+  if(preset.value === "custom") return;
+  applyPreset(preset.value);
+});
+
+updateReadouts();
+renderBackgroundStars(Number(bgStarCount.value));
+updateSkyStyles();
+</script>
 </body>
 </html>
