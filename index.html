@@ -133,6 +133,16 @@ h1{
    SKY CONTAINER
 ================================= */
 .sky{
+  <div class="celestial-viewer" id="viewer">
+  <div class="viewer-glow"></div>
+
+  <img id="viewerImage" src="" alt="">
+
+  <div class="viewer-caption">
+    <h2 id="viewerTitle"></h2>
+    <p id="viewerDescription"></p>
+  </div>
+</div>
   position:relative;
   width:100vw;
   height:100vh;
@@ -169,7 +179,42 @@ h1{
 .twinkle-off .background-star{
   animation:none;
 }
+const viewer =
+  document.getElementById("viewer");
 
+const viewerImage =
+  document.getElementById("viewerImage");
+
+const viewerTitle =
+  document.getElementById("viewerTitle");
+
+const viewerDescription =
+  document.getElementById("viewerDescription");
+
+document
+.querySelectorAll(".star-group")
+.forEach(star => {
+
+  star.addEventListener("mouseenter", () => {
+
+    viewerImage.src =
+      star.dataset.image;
+
+    viewerTitle.textContent =
+      star.dataset.title;
+
+    viewerDescription.textContent =
+      star.dataset.description;
+
+    viewer.classList.add("active");
+  });
+
+  star.addEventListener("mouseleave", () => {
+
+    viewer.classList.remove("active");
+  });
+
+});
 /* ================================
    STAR GROUP
 ================================= */
@@ -286,6 +331,144 @@ h1{
   color:rgba(255,255,255,0.85);
 }
 
+.celestial-viewer.active{
+  animation:
+    viewerFloat 6s ease-in-out infinite;
+}
+
+@keyframes viewerFloat{
+
+  0%{
+    transform:
+      translateX(-50%)
+      translateY(0px)
+      scale(1);
+  }
+
+  50%{
+    transform:
+      translateX(-50%)
+      translateY(-8px)
+      scale(1.01);
+  }
+
+  100%{
+    transform:
+      translateX(-50%)
+      translateY(0px)
+      scale(1);
+  }
+}
+
+/* ==================================
+   CELESTIAL IMAGE VIEWER
+================================== */
+
+.celestial-viewer{
+  position:absolute;
+
+  top:140px;
+  left:50%;
+
+  transform:
+    translateX(-50%)
+    scale(0.92);
+
+  width:min(900px, 70vw);
+  height:min(540px, 58vh);
+
+  opacity:0;
+
+  pointer-events:none;
+
+  transition:
+    opacity .5s ease,
+    transform .5s ease;
+
+  border-radius:34px;
+
+  overflow:hidden;
+
+  z-index:2500;
+
+  backdrop-filter:blur(20px);
+
+  background:
+    rgba(255,255,255,0.05);
+
+  border:
+    1px solid rgba(255,255,255,0.12);
+
+  box-shadow:
+    0 30px 80px rgba(0,0,0,0.45);
+}
+
+.celestial-viewer.active{
+  opacity:1;
+
+  transform:
+    translateX(-50%)
+    scale(1);
+}
+
+.celestial-viewer img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+
+  filter:
+    brightness(.9)
+    saturate(1.15);
+}
+
+/* nebula glow */
+
+.viewer-glow{
+  position:absolute;
+  inset:0;
+
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(140,180,255,.15),
+      transparent 60%
+    );
+
+  pointer-events:none;
+}
+
+.viewer-caption{
+  position:absolute;
+
+  left:0;
+  right:0;
+  bottom:0;
+
+  padding:28px;
+
+  background:
+    linear-gradient(
+      to top,
+      rgba(0,0,0,.72),
+      transparent
+    );
+}
+
+.viewer-caption h2{
+  font-size:2rem;
+  font-weight:300;
+  letter-spacing:1px;
+}
+
+.viewer-caption p{
+  margin-top:8px;
+
+  font-size:.95rem;
+
+  color:
+    rgba(255,255,255,.85);
+}  
+  
 /* ================================
    SHOOTING STAR
 ================================= */
@@ -393,15 +576,38 @@ h1{
     <div class="label"><b>Naos</b><br>Blue supergiant ~1,000 light-years away.</div>
   </div>
 
-  <div class="star-group" style="left:28%; top:48%;">
-    <div class="star medium"></div>
-    <div class="label"><b>Suhail</b><br>Ancient southern navigation star.</div>
+<div
+  class="star-group"
+  data-image="images/suhail.jpg"
+  data-title="Suhail"
+  data-description="Ancient southern navigation star."
+  style="left:28%; top:48%;">
+
+  <div class="star medium"></div>
+
+  <div class="label">
+    <b>Suhail</b><br>
+    Ancient southern navigation star.
   </div>
 
-  <div class="star-group" style="left:38%; top:62%;">
-    <div class="star medium"></div>
-    <div class="label"><b>Tureis</b><br>Yellow-white giant in Puppis.</div>
+</div>
+
+  <div
+  class="star-group"
+  data-image="images/tureis.jpg"
+  data-title="Tureis"
+  data-description="Yellow-white giant in Puppis."
+  style="left:28%; top:48%;">
+
+  <div class="star medium"></div>
+
+  <div class="label">
+    <b>Tureis</b><br>
+    Yellow-white giant in Puppis.
+
   </div>
+
+</div>
 
   <!-- ORION -->
   <div class="star-group" style="left:65%; top:24%;">
