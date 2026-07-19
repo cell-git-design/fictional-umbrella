@@ -3,760 +3,570 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-
-<title>3D Interactive Night Sky</title>
-<title>Immersive 3D Constellation Map</title>
+<title>Interactive Southern Sky</title>
 
 <style>
+:root{
+  --star-scale: 1;
+  --hover-scale: 2.7;
+  --glow-multiplier: 1;
+  --nebula-opacity: 1;
+}
 
 *{
-html, body{
   margin:0;
   padding:0;
   box-sizing:border-box;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Text",
+    "SF Pro Display",
+    "Helvetica Neue",
+    Helvetica,
+    Arial,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body{
   overflow:hidden;
-  background:
-    radial-gradient(circle at center,
-    #111827 0%,
-    #03040a 70%,
-    #000 100%);
-  background:black;
-  font-family:Arial, sans-serif;
+  height:100vh;
   color:white;
-  height:100%;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(120,160,255,0.10), transparent 55%),
+    radial-gradient(circle at 70% 80%, rgba(180,90,255,0.08), transparent 60%),
+    radial-gradient(circle at bottom, #0b1020 0%, #05060c 45%, #000000 100%);
 }
-
-/* TITLE */
 
 h1{
-#title{
   position:absolute;
-  top:20px;
+  top:18px;
   width:100%;
   text-align:center;
-  z-index:1000;
-  font-size:2.4rem;
+  z-index:3000;
   font-weight:300;
-  color:white;
-  z-index:10;
-  font-size:2.2rem;
-  letter-spacing:4px;
-  color:rgba(255,255,255,0.9);
-  font-weight:300;
-  text-shadow:
-    0 0 12px rgba(255,255,255,0.7),
-    0 0 30px rgba(120,160,255,0.5);
-    0 0 10px rgba(255,255,255,0.7),
-    0 0 30px rgba(100,150,255,0.6);
-  pointer-events:none;
+  font-size:2.5rem;
+  letter-spacing:6px;
+  color:rgba(255,255,255,0.92);
+  text-shadow:0 0 20px rgba(120,180,255,0.35);
 }
 
-/* SCENE */
+/* ================================
+   CONTROL MENU
+================================= */
+.control-bar{
+  position:fixed;
+  top:78px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:4000;
 
-.scene{
+  width:min(1180px, calc(100vw - 24px));
+  padding:14px 16px;
+
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px 16px;
+  justify-content:center;
+  align-items:end;
+
+  border-radius:22px;
+  background:rgba(255,255,255,0.07);
+  border:1px solid rgba(255,255,255,0.12);
+  backdrop-filter:blur(16px);
+  box-shadow:0 18px 50px rgba(0,0,0,0.35);
+}
+
+.control-group{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  min-width:150px;
+}
+
+.control-group label{
+  font-size:0.72rem;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,0.78);
+}
+
+.control-group small{
+  font-size:0.75rem;
+  color:rgba(255,255,255,0.65);
+}
+
+.control-bar input[type="range"]{
+  width:160px;
+  accent-color:#b8d4ff;
+}
+
+.control-bar select{
+  min-width:150px;
+  padding:9px 10px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.14);
+  background:rgba(255,255,255,0.08);
+  color:white;
+  outline:none;
+}
+
+.control-toggle{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:0.88rem;
+  color:rgba(255,255,255,0.88);
+  padding:8px 10px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.10);
+  background:rgba(255,255,255,0.05);
+}
+
+.control-toggle input{
+  accent-color:#c9e0ff;
+}
+
+/* ================================
+   SKY CONTAINER
+================================= */
+.sky{
+  position:relative;
   width:100vw;
   height:100vh;
+  transform-style:preserve-3d;
+  transition:transform 0.12s linear;
   perspective:1200px;
-  overflow:hidden;
-  cursor:grab;
 }
 
-.scene:active{
-  cursor:grabbing;
-}
-
-/* SKY SPHERE */
-/* INFO BOX */
-
-.sky{
-#info{
+.sky::before{
+  content:'';
   position:absolute;
-  width:2000px;
-  height:2000px;
-  left:50%;
-  top:50%;
-  transform-style:preserve-3d;
-  transform:
-    translate(-50%, -50%)
-    rotateX(0deg)
-    rotateY(0deg);
-  bottom:30px;
-  right:30px;
-  width:320px;
-  padding:18px;
-  border-radius:18px;
-  background:rgba(255,255,255,0.06);
-  backdrop-filter:blur(10px);
-  border:1px solid rgba(255,255,255,0.1);
-  color:rgba(255,255,255,0.85);
-  z-index:10;
-  line-height:1.5;
-}
-
-/* STARS */
-/* STAR LABEL */
-
-.star-group{
-#label{
-  position:absolute;
-  transform-style:preserve-3d;
-  text-align:center;
-  transition:
-    transform 0.2s ease,
-    z-index 0.2s;
-  color:white;
-  background:rgba(0,0,0,0.75);
-  padding:10px 14px;
-  border-radius:10px;
+  width:200%;
+  height:200%;
+  top:-50%;
+  left:-50%;
+  opacity:var(--nebula-opacity);
+  background:
+    radial-gradient(circle at 40% 40%, rgba(120,160,255,0.08), transparent 60%),
+    radial-gradient(circle at 60% 70%, rgba(200,120,255,0.05), transparent 65%);
   pointer-events:none;
-  transform:translate(-50%, -120%);
-  display:none;
-  z-index:20;
-  font-size:0.95rem;
-  border:1px solid rgba(255,255,255,0.15);
-  backdrop-filter:blur(6px);
-  box-shadow:
-    0 0 15px rgba(255,255,255,0.15);
 }
 
+/* ================================
+   BACKGROUND STARS
+================================= */
+.background-star{
+  position:absolute;
+  border-radius:50%;
+  background:white;
+  opacity:0.6;
+  animation:twinkle linear infinite;
+}
+
+.twinkle-off .background-star{
+  animation:none;
+}
+
+/* ================================
+   STAR GROUP
+================================= */
+.star-group{
+  position:absolute;
+  transform-style:preserve-3d;
+  transform:translate(-50%, -50%);
+  text-align:center;
+  animation:drift ease-in-out infinite alternate;
+}
+
+/* ================================
+   STAR CORE
+================================= */
 .star{
   margin:auto;
   border-radius:50%;
   background:
     radial-gradient(circle,
-    rgba(255,255,255,1) 0%,
-    rgba(255,255,255,0.85) 20%,
-    rgba(255,255,255,0.2) 65%,
-    transparent 100%);
-  animation:twinkle ease-in-out infinite;
-  transition:all 0.3s ease;
-canvas{
-  display:block;
+      rgba(255,255,255,1) 0%,
+      rgba(200,220,255,0.85) 25%,
+      rgba(150,180,255,0.25) 60%,
+      rgba(0,0,0,0) 100%);
+  box-shadow:
+    0 0 calc(10px * var(--glow-multiplier)) rgba(180,200,255,0.35);
+  transition:transform 0.35s ease, box-shadow 0.35s ease;
 }
 
-/* STAR SIZES */
-</style>
-</head>
-
+/* star sizes */
 .small{
-  width:5px;
-  height:5px;
+  width:calc(6px * var(--star-scale));
+  height:calc(6px * var(--star-scale));
 }
-<body>
-
 .medium{
-  width:10px;
-  height:10px;
+  width:calc(10px * var(--star-scale));
+  height:calc(10px * var(--star-scale));
 }
-<div id="title">
-  Interactive 3D Night Sky
-</div>
-
 .large{
-  width:16px;
-  height:16px;
+  width:calc(16px * var(--star-scale));
+  height:calc(16px * var(--star-scale));
 }
-<div id="info">
-  <strong>Immersive Constellation Viewer</strong><br><br>
-
-/* LABELS */
-  Drag to look around the celestial sphere.<br>
-  Scroll to zoom.<br>
-  Hover stars for details.<br><br>
-
-.label{
-  margin-top:10px;
-  font-size:0.78rem;
-  color:rgba(255,255,255,0.45);
-  white-space:nowrap;
-  pointer-events:none;
-  transition:all 0.25s ease;
-  letter-spacing:0.5px;
-}
-  Includes:
-  Orion, Crux, Puppis,
-  Scorpius, Taurus,
-  and Canis Major.
-</div>
-
-/* HOVER EFFECT */
-<div id="label"></div>
-
-.star-group:hover{
-  z-index:999;
-}
-<!-- THREE.JS -->
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 
 .star-group:hover .star{
-  transform:scale(2.8);
+  transform:scale(var(--hover-scale));
   box-shadow:
-    0 0 15px white,
-    0 0 35px rgba(255,255,255,0.9),
-    0 0 70px rgba(100,150,255,0.7);
+    0 0 18px rgba(255,255,255,0.95),
+    0 0 45px rgba(120,180,255,0.6),
+    0 0 90px rgba(160,120,255,0.25);
 }
-<!-- ORBIT CONTROLS -->
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
+
+/* ================================
+   LABEL
+================================= */
+.label{
+  margin-top:14px;
+  width:240px;
+  padding:10px 12px;
+  border-radius:14px;
+  font-size:0.82rem;
+  line-height:1.5;
+  font-weight:400;
+  letter-spacing:0.2px;
+  color:rgba(255,255,255,0.72);
+  opacity:0;
+  transform:translateY(10px) scale(0.96);
+  transition:all 0.4s ease;
+  pointer-events:none;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.10);
+  backdrop-filter:blur(12px);
+  box-shadow:0 10px 30px rgba(0,0,0,0.35);
+}
 
 .star-group:hover .label{
-  color:white;
-  font-size:1rem;
-  transform:translateY(-5px);
-  text-shadow:
-    0 0 10px white,
-    0 0 20px rgba(100,150,255,0.8);
+  opacity:1;
+  transform:translateY(-6px) scale(1);
+  color:rgba(255,255,255,0.95);
 }
-<script>
 
-/* BACKGROUND STARS */
-/* ---------------------------
-SCENE SETUP
----------------------------- */
-
-.bg-star{
-  position:absolute;
-  border-radius:50%;
-  background:white;
-  opacity:0.7;
-  animation:twinkle linear infinite;
+.labels-off .label{
+  display:none;
 }
-const scene = new THREE.Scene();
 
-/* INFO PANEL */
-scene.fog =
-  new THREE.FogExp2(0x000000, 0.0007);
-
-.info{
+/* ================================
+   INFO PANEL
+================================= */
+.info-panel{
   position:absolute;
   right:30px;
   bottom:30px;
-  width:320px;
-  padding:20px;
-  border-radius:20px;
-  background:rgba(255,255,255,0.05);
-  backdrop-filter:blur(10px);
-  border:1px solid rgba(255,255,255,0.08);
-  z-index:1000;
-  color:rgba(255,255,255,0.85);
-  line-height:1.5;
+  width:340px;
+  padding:22px;
+  border-radius:22px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.10);
+  backdrop-filter:blur(14px);
+  box-shadow:0 20px 60px rgba(0,0,0,0.45);
+  color:rgba(255,255,255,0.88);
+  animation:panelIn 1s ease forwards 0.3s;
+  transform:translateY(20px);
+  opacity:0;
 }
-const camera =
-  new THREE.PerspectiveCamera(
-    75,
-    window.innerWidth/window.innerHeight,
-    0.1,
-    5000
-  );
 
-/* SHOOTING STAR */
-camera.position.set(0,0,0.1);
+.info-panel h2{
+  font-weight:300;
+  font-size:1.25rem;
+  letter-spacing:0.5px;
+  margin-bottom:10px;
+}
 
+.info-panel p{
+  font-size:0.9rem;
+  line-height:1.55;
+  color:rgba(255,255,255,0.85);
+}
+
+/* ================================
+   SHOOTING STAR
+================================= */
 .shooting-star{
   position:absolute;
-  width:200px;
+  width:180px;
   height:2px;
-  background:
-    linear-gradient(to right,
-    rgba(255,255,255,1),
-    transparent);
+  background:linear-gradient(to right, white, transparent);
   opacity:0;
-  transform:rotate(-30deg);
-  animation:shooting 12s linear infinite;
+  transform:rotate(-25deg);
+  animation:shooting 11s linear infinite;
 }
-const renderer =
-  new THREE.WebGLRenderer({
-    antialias:true
-  });
 
-/* ANIMATIONS */
-renderer.setSize(
-  window.innerWidth,
-  window.innerHeight
-);
+.shooting-off .shooting-star{
+  display:none;
+}
 
+/* ================================
+   ANIMATIONS
+================================= */
 @keyframes twinkle{
-  0%{ opacity:0.4; }
+  0%{ opacity:0.45; }
   50%{ opacity:1; }
-  100%{ opacity:0.4; }
+  100%{ opacity:0.45; }
 }
-renderer.setPixelRatio(window.devicePixelRatio);
 
 @keyframes shooting{
-document.body.appendChild(renderer.domElement);
+  0%{ top:-10%; left:-20%; opacity:0; }
+  5%{ opacity:1; }
+  15%{ top:40%; left:120%; opacity:0; }
+  100%{ opacity:0; }
+}
 
-  0%{
-    top:-10%;
-    left:-20%;
-    opacity:0;
-  }
-/* ---------------------------
-CONTROLS
----------------------------- */
+@keyframes drift{
+  0%{ transform:translate(-50%, -50%) translate(-3px,-2px); }
+  50%{ transform:translate(-50%, -50%) translate(2px,3px); }
+  100%{ transform:translate(-50%, -50%) translate(-2px,1px); }
+}
 
-  5%{
+@keyframes panelIn{
+  to{
+    transform:translateY(0);
     opacity:1;
   }
-const controls =
-  new THREE.OrbitControls(
-    camera,
-    renderer.domElement
-  );
-
-  15%{
-    top:40%;
-    left:120%;
-    opacity:0;
-  }
-controls.enablePan = false;
-controls.enableDamping = true;
-controls.dampingFactor = 0.04;
-controls.rotateSpeed = 0.6;
-controls.minDistance = 0.1;
-controls.maxDistance = 2;
-
-  100%{
-    opacity:0;
-  }
 }
-/* ---------------------------
-STARFIELD
----------------------------- */
-
 </style>
 </head>
-const bgGeometry =
-  new THREE.BufferGeometry();
 
 <body>
-const bgVertices = [];
+<h1>Southern Night Sky</h1>
 
-<h1>Interactive 3D Night Sky</h1>
-for(let i=0;i<5000;i++){
-
-<div class="scene" id="scene">
-  const radius = 1800;
-
-  <div class="sky" id="sky">
-  const theta =
-    Math.random()*Math.PI*2;
-
-    <!-- SHOOTING STAR -->
-    <div class="shooting-star"></div>
-  const phi =
-    Math.acos(
-      (Math.random()*2)-1
-    );
-
-    <!-- CONSTELLATION STARS -->
-  const x =
-    radius *
-    Math.sin(phi) *
-    Math.cos(theta);
-
-    <!-- ORION -->
-    <div class="star-group" style="left:1200px; top:400px;">
-      <div class="star large"></div>
-      <div class="label">Betelgeuse — Red supergiant</div>
-    </div>
-  const y =
-    radius *
-    Math.sin(phi) *
-    Math.sin(theta);
-
-    <div class="star-group" style="left:1300px; top:600px;">
-      <div class="star medium"></div>
-      <div class="label">Alnilam — Belt star</div>
-    </div>
-  const z =
-    radius *
-    Math.cos(phi);
-
-    <div class="star-group" style="left:1380px; top:850px;">
-      <div class="star large"></div>
-      <div class="label">Rigel — Blue supergiant</div>
-    </div>
-  bgVertices.push(x,y,z);
-}
-
-    <!-- CRUX -->
-    <div class="star-group" style="left:1650px; top:1200px;">
-      <div class="star medium"></div>
-      <div class="label">Mimosa — Blue giant</div>
-    </div>
-bgGeometry.setAttribute(
-  'position',
-  new THREE.Float32BufferAttribute(
-    bgVertices,
-    3
-  )
-);
-
-const bgMaterial =
-  new THREE.PointsMaterial({
-    color:0xffffff,
-    size:2,
-    transparent:true,
-    opacity:0.8
-  });
-
-const backgroundStars =
-  new THREE.Points(
-    bgGeometry,
-    bgMaterial
-  );
-
-scene.add(backgroundStars);
-
-/* ---------------------------
-CONSTELLATION STARS
----------------------------- */
-
-const stars = [
-
-{
-  name:"Betelgeuse",
-  desc:"Red supergiant in Orion",
-  color:0xff8855,
-  size:10,
-  theta:1.2,
-  phi:1.1
-},
-
-{
-  name:"Rigel",
-  desc:"Blue supergiant in Orion",
-  color:0x99ccff,
-  size:9,
-  theta:1.35,
-  phi:1.4
-},
-
-{
-  name:"Sirius",
-  desc:"Brightest night sky star",
-  color:0xffffff,
-  size:12,
-  theta:2.0,
-  phi:1.8
-},
-
-{
-  name:"Acrux",
-  desc:"Brightest star in Crux",
-  color:0xaaccff,
-  size:10,
-  theta:3.0,
-  phi:2.1
-},
-
-{
-  name:"Mimosa",
-  desc:"Blue giant in Crux",
-  color:0xaaccff,
-  size:8,
-  theta:3.1,
-  phi:2.0
-},
-
-{
-  name:"Antares",
-  desc:"Red supergiant in Scorpius",
-  color:0xff6644,
-  size:11,
-  theta:4.0,
-  phi:1.5
-},
-
-{
-  name:"Aldebaran",
-  desc:"Orange giant in Taurus",
-  color:0xffaa66,
-  size:9,
-  theta:5.0,
-  phi:1.0
-},
-
-{
-  name:"Naos",
-  desc:"Blue supergiant in Puppis",
-  color:0xaaddff,
-  size:9,
-  theta:2.7,
-  phi:2.3
-}
-
-    <div class="star-group" style="left:1720px; top:1380px;">
-      <div class="star large"></div>
-      <div class="label">Acrux — Brightest in Crux</div>
-    </div>
-];
-
-    <!-- PUPPIS -->
-    <div class="star-group" style="left:600px; top:1100px;">
-      <div class="star large"></div>
-      <div class="label">Naos — Blue supergiant</div>
-    </div>
-const starObjects = [];
-
-    <div class="star-group" style="left:760px; top:980px;">
-      <div class="star medium"></div>
-      <div class="label">Suhail — Navigation star</div>
-    </div>
-const starTexture =
-  new THREE.TextureLoader().load(
-    "https://threejs.org/examples/textures/sprites/disc.png"
-  );
-
-    <!-- CANIS MAJOR -->
-    <div class="star-group" style="left:1100px; top:1500px;">
-      <div class="star large"></div>
-      <div class="label">Sirius — Brightest night star</div>
-    </div>
-stars.forEach(star=>{
-
-    <div class="star-group" style="left:1250px; top:1400px;">
-      <div class="star medium"></div>
-      <div class="label">Adhara — Extremely luminous</div>
-    </div>
-  const radius = 1000;
-
-    <!-- SCORPIUS -->
-    <div class="star-group" style="left:350px; top:700px;">
-      <div class="star large"></div>
-      <div class="label">Antares — Red supergiant</div>
-    </div>
-  const x =
-    radius *
-    Math.sin(star.phi) *
-    Math.cos(star.theta);
-
-    <div class="star-group" style="left:450px; top:900px;">
-      <div class="star medium"></div>
-      <div class="label">Shaula — Scorpion tail star</div>
-    </div>
-  const y =
-    radius *
-    Math.cos(star.phi);
-
-    <!-- TAURUS -->
-    <div class="star-group" style="left:1450px; top:250px;">
-      <div class="star large"></div>
-      <div class="label">Aldebaran — Orange giant</div>
-    </div>
-  const z =
-    radius *
-    Math.sin(star.phi) *
-    Math.sin(star.theta);
-
-    <!-- BACKGROUND STARS GENERATED BY JS -->
-  const material =
-    new THREE.SpriteMaterial({
-      map:starTexture,
-      color:star.color,
-      transparent:true,
-      blending:THREE.AdditiveBlending
-    });
-
+<div class="control-bar">
+  <div class="control-group">
+    <label for="preset">Display preset</label>
+    <select id="preset">
+      <option value="custom">Custom</option>
+      <option value="calm">Calm</option>
+      <option value="standard" selected>Standard</option>
+      <option value="radiant">Radiant</option>
+    </select>
   </div>
-  const sprite =
-    new THREE.Sprite(material);
 
+  <div class="control-group">
+    <label for="bgStarCount">Background stars <span id="bgStarCountValue">260</span></label>
+    <input id="bgStarCount" type="range" min="40" max="500" value="260">
+  </div>
+
+  <div class="control-group">
+    <label for="starSize">Star size <span id="starSizeValue">100%</span></label>
+    <input id="starSize" type="range" min="70" max="150" value="100">
+  </div>
+
+  <div class="control-group">
+    <label for="glow">Glow intensity <span id="glowValue">100%</span></label>
+    <input id="glow" type="range" min="60" max="180" value="100">
+  </div>
+
+  <div class="control-group">
+    <label for="nebula">Nebula haze <span id="nebulaValue">100%</span></label>
+    <input id="nebula" type="range" min="0" max="150" value="100">
+  </div>
+
+  <div class="control-toggle">
+    <input id="labelsToggle" type="checkbox" checked>
+    <label for="labelsToggle">Labels</label>
+  </div>
+
+  <div class="control-toggle">
+    <input id="shootToggle" type="checkbox" checked>
+    <label for="shootToggle">Shooting star</label>
+  </div>
+
+  <div class="control-toggle">
+    <input id="twinkleToggle" type="checkbox" checked>
+    <label for="twinkleToggle">Twinkle</label>
+  </div>
 </div>
-  sprite.position.set(x,y,z);
 
-<div class="info">
-  <strong>3D Sky Navigation</strong><br><br>
-  sprite.scale.set(
-    star.size,
-    star.size,
-    1
-  );
+<div class="sky" id="sky">
+  <div class="shooting-star"></div>
 
-  Click and drag to rotate the night sky.
-  Hover over stars to reveal constellation details.
-  sprite.userData = {
-    name:star.name,
-    desc:star.desc
-  };
+  <!-- PUPPIS -->
+  <div class="star-group" style="left:18%; top:58%;">
+    <div class="star large"></div>
+    <div class="label"><b>Naos</b><br>Blue supergiant ~1,000 light-years away.</div>
+  </div>
 
-  <br><br>
-  scene.add(sprite);
+  <div class="star-group" style="left:28%; top:48%;">
+    <div class="star medium"></div>
+    <div class="label"><b>Suhail</b><br>Ancient southern navigation star.</div>
+  </div>
 
-  Includes:
-  Orion, Crux, Puppis,
-  Canis Major, Scorpius,
-  and Taurus.
-  starObjects.push(sprite);
+  <div class="star-group" style="left:38%; top:62%;">
+    <div class="star medium"></div>
+    <div class="label"><b>Tureis</b><br>Yellow-white giant in Puppis.</div>
+  </div>
 
+  <!-- ORION -->
+  <div class="star-group" style="left:65%; top:24%;">
+    <div class="star large"></div>
+    <div class="label"><b>Betelgeuse</b><br>Red supergiant nearing supernova.</div>
+  </div>
+
+  <div class="star-group" style="left:70%; top:35%;">
+    <div class="star medium"></div>
+    <div class="label"><b>Alnilam</b><br>Central belt star of Orion.</div>
+  </div>
+
+  <div class="star-group" style="left:75%; top:46%;">
+    <div class="star large"></div>
+    <div class="label"><b>Rigel</b><br>Blue supergiant ~860 light-years away.</div>
+  </div>
+
+  <!-- CRUX -->
+  <div class="star-group" style="left:82%; top:66%;">
+    <div class="star medium"></div>
+    <div class="label"><b>Mimosa</b><br>Hot blue giant star.</div>
+  </div>
+
+  <div class="star-group" style="left:86%; top:75%;">
+    <div class="star large"></div>
+    <div class="label"><b>Acrux</b><br>Brightest star in Southern Cross.</div>
+  </div>
+
+  <!-- CANIS MAJOR -->
+  <div class="star-group" style="left:54%; top:72%;">
+    <div class="star large"></div>
+    <div class="label"><b>Sirius</b><br>Brightest star in the night sky.</div>
+  </div>
 </div>
-});
+
+<div class="info-panel">
+  <h2>Interactive Sky</h2>
+  <p>
+    A minimal Apple-style celestial interface.
+    Hover stars for detailed astronomical context.
+    Use the menu above to change the feel of the sky.
+  </p>
+</div>
 
 <script>
-/* ---------------------------
-RAYCASTING
----------------------------- */
-
-/* BACKGROUND STARS */
-const raycaster =
-  new THREE.Raycaster();
-
 const sky = document.getElementById("sky");
-const mouse =
-  new THREE.Vector2();
 
-for(let i=0;i<500;i++){
-const label =
-  document.getElementById("label");
+const bgStarCount = document.getElementById("bgStarCount");
+const starSize = document.getElementById("starSize");
+const glow = document.getElementById("glow");
+const nebula = document.getElementById("nebula");
+const labelsToggle = document.getElementById("labelsToggle");
+const shootToggle = document.getElementById("shootToggle");
+const twinkleToggle = document.getElementById("twinkleToggle");
+const preset = document.getElementById("preset");
 
-  const s = document.createElement("div");
-window.addEventListener(
-  "mousemove",
-  event=>{
+const bgStarCountValue = document.getElementById("bgStarCountValue");
+const starSizeValue = document.getElementById("starSizeValue");
+const glowValue = document.getElementById("glowValue");
+const nebulaValue = document.getElementById("nebulaValue");
 
-  s.classList.add("bg-star");
-    mouse.x =
-      (event.clientX /
-      window.innerWidth)*2-1;
-
-  const size = Math.random()*3;
-    mouse.y =
-      -(event.clientY /
-      window.innerHeight)*2+1;
-
-  s.style.width = size + "px";
-  s.style.height = size + "px";
-  }
-);
-
-  s.style.left = Math.random()*2000 + "px";
-  s.style.top = Math.random()*2000 + "px";
-/* ---------------------------
-ANIMATION
----------------------------- */
-
-  s.style.animationDuration =
-    (2 + Math.random()*6) + "s";
-function animate(){
-
-  sky.appendChild(s);
-}
-  requestAnimationFrame(animate);
-
-/* DRAG ROTATION */
-  controls.update();
-
-const scene = document.getElementById("scene");
-  backgroundStars.rotation.y += 0.0001;
-
-let isDragging = false;
-  raycaster.setFromCamera(
-    mouse,
-    camera
-  );
-
-let currentX = 0;
-let currentY = 0;
-  const intersects =
-    raycaster.intersectObjects(
-      starObjects
-    );
-
-let targetX = 0;
-let targetY = 0;
-  if(intersects.length>0){
-
-scene.addEventListener("mousedown",(e)=>{
-  isDragging = true;
-});
-    const obj = intersects[0].object;
-
-window.addEventListener("mouseup",()=>{
-  isDragging = false;
-});
-    label.style.display = "block";
-
-window.addEventListener("mousemove",(e)=>{
-    label.innerHTML =
-      "<strong>" +
-      obj.userData.name +
-      "</strong><br>" +
-      obj.userData.desc;
-
-  if(!isDragging) return;
-    label.style.left =
-      event.clientX + "px";
-
-  targetY += e.movementX * 0.3;
-  targetX -= e.movementY * 0.3;
-});
-    label.style.top =
-      event.clientY + "px";
-
-/* SMOOTH ANIMATION */
-    obj.scale.set(18,18,1);
-
-function animate(){
-  } else {
-
-  currentX += (targetX-currentX)*0.08;
-  currentY += (targetY-currentY)*0.08;
-    label.style.display = "none";
-
-  sky.style.transform =
-    `
-    translate(-50%, -50%)
-    rotateX(${currentX}deg)
-    rotateY(${currentY}deg)
-    `;
-    starObjects.forEach(star=>{
-
-  requestAnimationFrame(animate);
-      const original =
-        stars.find(
-          s=>s.name===star.userData.name
-        );
-
-      star.scale.set(
-        original.size,
-        original.size,
-        1
-      );
-
-    });
-
-  }
-
-  renderer.render(scene,camera);
+function updateReadouts(){
+  bgStarCountValue.textContent = bgStarCount.value;
+  starSizeValue.textContent = `${starSize.value}%`;
+  glowValue.textContent = `${glow.value}%`;
+  nebulaValue.textContent = `${nebula.value}%`;
 }
 
-animate();
+function renderBackgroundStars(count){
+  document.querySelectorAll(".background-star").forEach(el => el.remove());
 
-/* ---------------------------
-RESIZE
----------------------------- */
+  const shootingStar = sky.querySelector(".shooting-star");
 
-window.addEventListener(
-  "resize",
-  ()=>{
+  for(let i = 0; i < count; i++){
+    const s = document.createElement("div");
+    s.className = "background-star";
 
-    camera.aspect =
-      window.innerWidth/
-      window.innerHeight;
+    const size = Math.random() * 2.5;
+    s.style.width = size + "px";
+    s.style.height = size + "px";
+    s.style.left = Math.random() * 100 + "%";
+    s.style.top = Math.random() * 100 + "%";
+    s.style.animationDuration = (2 + Math.random() * 6) + "s";
 
-    camera.updateProjectionMatrix();
-
-    renderer.setSize(
-      window.innerWidth,
-      window.innerHeight
-    );
-
+    sky.insertBefore(s, shootingStar);
   }
-);
+}
 
+function updateSkyStyles(){
+  sky.style.setProperty("--star-scale", (starSize.value / 100));
+  sky.style.setProperty("--glow-multiplier", (glow.value / 100));
+  sky.style.setProperty("--nebula-opacity", (nebula.value / 100));
+  sky.style.setProperty("--hover-scale", "2.7");
+
+  sky.classList.toggle("labels-off", !labelsToggle.checked);
+  sky.classList.toggle("shooting-off", !shootToggle.checked);
+  sky.classList.toggle("twinkle-off", !twinkleToggle.checked);
+
+  updateReadouts();
+}
+
+function applyPreset(name){
+  const settings = {
+    calm: {
+      stars: 120,
+      size: 90,
+      glow: 75,
+      nebula: 55,
+      labels: true,
+      shooting: false,
+      twinkle: true
+    },
+    standard: {
+      stars: 260,
+      size: 100,
+      glow: 100,
+      nebula: 100,
+      labels: true,
+      shooting: true,
+      twinkle: true
+    },
+    radiant: {
+      stars: 380,
+      size: 115,
+      glow: 140,
+      nebula: 130,
+      labels: true,
+      shooting: true,
+      twinkle: true
+    }
+  };
+
+  if(!settings[name]) return;
+
+  const s = settings[name];
+  bgStarCount.value = s.stars;
+  starSize.value = s.size;
+  glow.value = s.glow;
+  nebula.value = s.nebula;
+  labelsToggle.checked = s.labels;
+  shootToggle.checked = s.shooting;
+  twinkleToggle.checked = s.twinkle;
+
+  renderBackgroundStars(Number(bgStarCount.value));
+  updateSkyStyles();
+}
+
+bgStarCount.addEventListener("input", () => {
+  renderBackgroundStars(Number(bgStarCount.value));
+  updateSkyStyles();
+});
+
+[starSize, glow, nebula, labelsToggle, shootToggle, twinkleToggle].forEach(el => {
+  el.addEventListener("input", updateSkyStyles);
+  el.addEventListener("change", updateSkyStyles);
+});
+
+preset.addEventListener("change", () => {
+  if(preset.value === "custom") return;
+  applyPreset(preset.value);
+});
+
+updateReadouts();
+renderBackgroundStars(Number(bgStarCount.value));
+updateSkyStyles();
 </script>
-
 </body>
 </html>
